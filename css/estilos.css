@@ -1,0 +1,74 @@
+body{
+  font-size: 2rem !important;
+}
+
+#formulario{
+   font-family: 'Lato', sans-serif;
+}
+
+.alertsRow, #loading-screen{
+  display: none;
+  z-index: 1;
+}
+
+@media only screen and (max-width: 1000px){
+  #formulario{
+    width: 100%;
+  }
+
+  .codeTable{
+    height: 5rem;
+  }
+
+  .form-control-lg, .custom-select-lg {
+    height: : 5rem!important;
+    font-size: 2.5rem!important;
+  }
+
+  option{
+    font-size: 1rem;
+  }
+
+  #btn-login, #btn-save-config{
+    font-size: 2.3rem!important;
+  }
+
+  h1{
+    font-size: 3.5rem!important;
+  }
+
+  .alertsRow{
+    font-size: 3.5rem;
+    text-transform: uppercase;
+  }
+}
+
+.info{
+  font-weight: bold;
+}
+
+.infoG{
+  font-size: 0.5rem;
+}
+
+
+/*Menu*/
+#colectInfo p span, #configInfo p span{
+  font-weight: bold;
+}
+
+#colectInfo p, #configInfo p{
+  color: #f8f9fad9;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+@media only screen and (min-width: 768px){
+  .menu-item{
+    padding: 5px 25px;
+    font-size: 3rem;
+  }
+}
+.logo{
+  width: 25%;
+}
