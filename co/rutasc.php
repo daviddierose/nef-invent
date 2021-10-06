@@ -1,5 +1,5 @@
 <?php
-require_once "../colect-ingresar-numero-1/mo/rutasm.php";
+require_once (getcwd()."/mo/rutasm.php");
 
 class rutasControlador{
   public function Plantilla(){

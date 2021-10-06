@@ -1,4 +1,5 @@
 <?php
+
 	require_once "co/rutasc.php";
 	require_once "co/adminc.php";
 
