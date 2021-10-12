@@ -1,17 +1,122 @@
+/*General*/
 body{
-  font-size: 2rem !important;
+  overflow-x: hidden;
+  font-size: 1rem !important;
+  font-family: 'Lato', sans-serif;
+}
+.separator{
+  margin: 1rem;
+  border-bottom: 1px solid #d3cfcf;
+}
+.text-uppercase{
+  letter-spacing: 0.1em;
+}
+.text-gray{
+  color: #858383;
+}
+.text-red{
+  color: #BF1C13
+}
+.text-azul{
+  color: #004585
+}
+.bg-gray{
+  background-color: #858383!important;
+}
+/*Menú*/
+.vertical-nav{
+  background: #4E4E4E;
+  min-width: 17rem;
+  width: 17rem;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+  transition: all 0.4s;
+  overflow: hidden;
+}
+#sidebar.active{
+  margin-left: -100%;
+}
+/*Info Colector*/
+#colectInfo, #configInfo{
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+#colectInfo p span, #configInfo p span{
+  font-weight: normal;
+}
+#colectInfo p, #configInfo p{
+  color: #f8f9fad9;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+/*Logo*/
+.logo{
+  width: 75%;
+}
+/*UL*/
+.nav-link{
+  text-transform: capitalize;
+}
+.nav-link:hover, #exitLink:hover{
+  background: #aaa;
+  color: #fff!important;
+  border-top-right-radius:25px;
+  border-bottom-right-radius: 25px;
+}
+#sidebar ul li .active{
+  color: #2c2c2c;
+}
+.text-primary{
+  color: #7579e7;
 }
 
-#formulario{
-   font-family: 'Lato', sans-serif;
+/*contenido*/
+.page-content{
+  width: cal(100% - 17rem);
+  margin-left: 17rem;
+  transition: all 0.4s;
+}
+#content.active{
+  width: 100%;
+  margin: 0;
 }
 
+/*Info in Code*/
+.info{
+  font-weight: bold;
+}
+
+.infoG{
+  font-size: 0.5rem;
+}
+
+/*@media(max-width: 768px){
+  #sidebar{
+    margin-left: -17rem;
+    }
+  #sidebar.active{
+    margin-left: 0;
+  }
+  #content{
+    width: 100%;
+    margin: 0;
+  }
+  #content.active{
+    margin-left: 17rem;
+    width: calc(100%-17rem);
+  }
+
+}*/
+/*Alertas*/
 .alertsRow, #loading-screen{
   display: none;
   z-index: 1;
 }
 
-@media only screen and (max-width: 1000px){
+/*@media only screen and (max-width: 1000px){
   #formulario{
     width: 100%;
   }
@@ -41,34 +146,13 @@ body{
     font-size: 3.5rem;
     text-transform: uppercase;
   }
-}
-
-.info{
-  font-weight: bold;
-}
-
-.infoG{
-  font-size: 0.5rem;
-}
+}*/
 
 
-/*Menu*/
-#colectInfo p span, #configInfo p span{
-  font-weight: bold;
-}
 
-#colectInfo p, #configInfo p{
-  color: #f8f9fad9;
-  margin-bottom: 0px;
-  padding-bottom: 0px;
-}
-
-@media only screen and (min-width: 768px){
+/*@media only screen and (min-width: 768px){
   .menu-item{
     padding: 5px 25px;
     font-size: 3rem;
   }
-}
-.logo{
-  width: 25%;
-}
+}*/

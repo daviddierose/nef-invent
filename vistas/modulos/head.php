@@ -3,6 +3,7 @@
 		<script src="js/jquery-3.5.1.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 		<script src="js/functions.js"></script>
+		<script src="js/mobile-detect.min.js"></script>
 		<script src="js/app.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/estilos.css">
 		<link rel="stylesheet" type="text/css" href="css/bootstrap.css" media="screen">

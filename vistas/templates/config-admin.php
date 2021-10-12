@@ -5,7 +5,7 @@
    ?>
   <body>
   <?php
-    include "vistas/modulos/menus.php";
+    include "vistas/modulos/sidebar-menu.php";
     include "vistas/modulos/alerts.php";
    ?>
   </body>

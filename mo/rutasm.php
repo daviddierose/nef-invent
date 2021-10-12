@@ -4,9 +4,10 @@
     static public function rutasModelo($rutas){
       if($rutas == "login"
       || $rutas == "in-code"
-      || $rutas == "config"
+      || $rutas == "config-colect"
       || $rutas == "review-list"
-      || $rutas == "exitc"){
+      || $rutas == "exitc"
+      || $rutas == "config-admin"){
           $pagina = "vistas/templates/" . $rutas . ".php";
       }
       else if($rutas == "index") {
@@ -18,73 +19,81 @@
       return $pagina;
     }
 
-    static public function menusM($rutas){
-      if($rutas == "review-list"){
-          $menu = '<li class="nav-item menu-item" id="">
-            <a class="nav-link text-uppercase" href="?ruta=login">Configuración</a>
-          </li>
-          <li class="nav-item menu-item" id="">
-            <a class="nav-link text-uppercase" href="?ruta=in-code">Ingresar códigos</a>
-          </li>
-          <li class="nav-item menu-item" id="deleteCodesRev">
-            <a class="nav-link text-uppercase">Eliminar Listado</a>
-          </li>';
-      }
-      else if($rutas == "config"){
-          $menu = '<li class="nav-item menu-item" id="">
-            <a class="nav-link text-uppercase" href="?ruta=in-code">Ingresar códigos</a>
-          </li>
-          <li class="nav-item menu-item" id="">
-            <a class="nav-link text-uppercase" href="?ruta=review-list">Revisar Listados</a>
-          </li>
-          <li class="nav-item menu-item bg-danger" id="">
-            <a class="nav-link text-light text-uppercase" href="?ruta=in-code">Salir</a>
-          </li>';
-      }
-      else if($rutas == "login"){
-          $menu = '<li class="nav-item menu-item" id="">
-            <a class="nav-link text-uppercase" href="?ruta=in-code">Ingresar códigos</a>
-          </li>
-          <li class="nav-item menu-item" id="">
-            <a class="nav-link text-uppercase" href="?ruta=review-list">Revisar Listados</a>
-          </li>';
-      }
-      else if($rutas == "index" || $rutas == "in-code") {
-          $menu = '<li class="nav-item menu-item" id="">
-            <a class="nav-link text-uppercase" href="?ruta=login">Configuración</a>
-          </li>
-          <li class="nav-item menu-item" id="">
-            <a class="nav-link text-uppercase" href="?ruta=review-list">Revisar Listados</a>
-          </li>
-          <li class="nav-item menu-item bg-danger" id="deleteCodes">
-            <a class="nav-link text-light text-uppercase" href="#">Limpiar Listado en Proceso</a>
-          </li>
-          <li class="nav-item menu-item bg-azulSec" id="saveCodes">
-            <a class="nav-link text-light text-uppercase" href="#">Guardar</a>
-          </li>';
+    static public function menusColect1M($rutas){
+      if($rutas == "login"
+      || $rutas == "in-code"
+      || $rutas == "config-colect"
+      || $rutas == "review-list"
+      || $rutas == "exitc"){
+          $menu = "vistas/modulos/menu-colector.php";
+      }else if($rutas == "index") {
+          $menu = "vistas/modulos/menu-colector.php";
       }
       else{
-          $menu = '<li class="nav-item menu-item" id="">
-            <a class="nav-link text-uppercase" href="?ruta=login">Configuración</a>
-          </li>
-          <li class="nav-item menu-item" id="">
-            <a class="nav-link text-uppercase" href="?ruta=review-list">Revisar Listados</a>
-          </li>
-          <li class="nav-item menu-item bg-danger" id="deleteCodes">
-            <a class="nav-link text-light text-uppercase" href="#">Limpiar Listado en Proceso</a>
-          </li>
-          <li class="nav-item menu-item bg-azulSec" id="saveCodes">
-            <a class="nav-link text-light text-uppercase" href="#">Guardar</a>
-          </li>';
+          $menu = "vistas/modulos/menu-colector.php";
       }
       return $menu;
     }
+
+    static public function menusColect2M($rutas){
+        if($rutas == "review-list"){
+          $menu2 ='<div class="separator"></div>
+            <ul class="nav flex-column bg-white mb-0">
+              <li class="" id="deleteListCodes">
+                <a class="nav-link text-uppercase text-red" href="#">
+                  <i class="fas fa-trash-alt mr-2"></i>Eliminar Listado
+                </a>
+              </li>';
+        }
+        else if($rutas == "config-colect"){
+          $menu2 ='<div class="separator"></div>
+            <ul class="nav flex-column bg-white mb-0">
+              <li>
+                <a class="nav-link text-uppercase text-red" href="?ruta=exitc">
+                  <i class="fas fa-sign-out-alt mr-2"></i>Salir
+                </a>
+              </li>';
+        }
+        else if($rutas == "login"){
+          $menu2 ='';
+        }
+        else if($rutas == "index" || $rutas == "in-code") {
+          $menu2 ='<div class="separator"></div>
+            <ul class="nav flex-column bg-white mb-0">
+              <li class="" id="deleteCodes">
+                <a class="nav-link text-uppercase text-red" href="#">
+                  <i class="fas fa-eraser mr-2"></i>Limpiar Listado
+                </a>
+              </li>
+              <li class="" id="saveCodes">
+                <a class="nav-link text-uppercase text-azul" href="#">
+                  <i class="fas fa-cloud-upload-alt mr-2"></i>Guardar Listado
+                </a>
+              </li>
+            </ul>';
+        }else{
+          $menu2 ='<div class="separator"></div>
+            <ul class="nav flex-column bg-white mb-0">
+              <li class="" id="deleteCodes">
+                <a class="nav-link text-uppercase text-red" href="#">
+                  <i class="fas fa-eraser mr-2"></i>Limpiar Listado
+                </a>
+              </li>
+              <li class="" id="saveCodes">
+                <a class="nav-link text-uppercase text-azul" href="#">
+                  <i class="fas fa-cloud-upload-alt mr-2"></i>Guardar Listado
+                </a>
+              </li>
+            </ul>';
+        }
+    return $menu2;
+  }
 
     static public function headTittlesM($rutas){
       if($rutas == "review-list"){
           $headTittle = "Revisión de Listados | Nefnodel Colector";
       }
-      else if($rutas == "config"){
+      else if($rutas == "config-colect"){
           $headTittle = "Configuración de Colector | Nefnodel Colector";
       }
       else if($rutas == "login"){
@@ -103,7 +112,7 @@
       if($rutas == "review-list"){
           $th = "";
       }
-      else if($rutas == "config"){
+      else if($rutas == "config-colect"){
           $th = "";
       }
       else if($rutas == "login"){

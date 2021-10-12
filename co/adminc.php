@@ -10,7 +10,7 @@ class AdminC{
       if ($respuesta["usuario"] == $_POST["usuarioI"] && $respuesta["clave"] == $_POST["claveI"]){
             session_start();
                 $_SESSION["Ingreso"] = true;
-                header("location:index.php?ruta=config");
+                header("location:index.php?ruta=config-colect");
       }else{
         echo "ERROR AL INGRESAR";
       }

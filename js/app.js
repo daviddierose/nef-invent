@@ -2,10 +2,8 @@ var codeKeyComplete = [];
 //var codes = [];
 var numberColectorInfo;
 //let colectConfig;
-let info;
-let date;
-let ok;
-let bad;
+var md;
+let info, date, ok, bad;
 const alertNoConfig = new alerts("alert-danger", `El colector no esta
                       Configurado. Pidele a tu administrador que seleccione
                       una configuración para el equipo.`, 5000);
@@ -27,6 +25,11 @@ const alertNoConfig = new alerts("alert-danger", `El colector no esta
         codes = codesC.getCodes();
       }
         table(codes, "reverse");
+        md = new MobileDetect(window.navigator.userAgent);
+        if(md.os() == "AndroidOS"){
+          $('#sidebar').css('width', $(window).width()).css('height', $(window).height());
+          $('#sidebarCollapseM').toggleClass('d-none');
+        }
     }).catch(err =>{
       console.log("no");
     });
@@ -92,4 +95,11 @@ const alertNoConfig = new alerts("alert-danger", `El colector no esta
         codesC.deleteCodesRev(cor);
         $('.navbar-toggler').trigger('click');
       });
+
+      $(document).on('click', '.sidebarCollapse', function(){
+        $('#sidebar, #content').toggleClass('active');
+        if(md.os() == "AndroidOS"){
+          $('page-content').toggleClass('d-none');
+          }
+        });
 });

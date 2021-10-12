@@ -90,7 +90,7 @@ class configColectorC{
       }else{
         config = "No Configurado";
       }
-      $("#configInfo").html(`<p>Configuración: <span>${config}</span></p>`);
+      $("#configInfo").html(`<p>Config: <span>${config}</span></p>`);
       $("#colectInfo").html(`<p>Colector: <span>${colectConfig[0]}</span></p>`);
 
       if(!!document.getElementById("select-config")){

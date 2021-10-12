@@ -18,7 +18,7 @@ class rutasControlador{
     include $respuesta;
   }
 
-  public function menusR(){
+  public function menusColect1R(){
     if(isset($_GET["ruta"])){
       $rutas = $_GET["ruta"];
     }
@@ -26,7 +26,19 @@ class rutasControlador{
       $rutas = "index";
     }
 
-    $respuesta = Modelo::menusM($rutas);
+    $respuesta = Modelo::menusColect1M($rutas);
+    include $respuesta;
+  }
+
+  public function menusColect2R(){
+    if(isset($_GET["ruta"])){
+      $rutas = $_GET["ruta"];
+    }
+    else{
+      $rutas = "index";
+    }
+
+    $respuesta = Modelo::menusColect2M($rutas);
     echo $respuesta;
   }
 
