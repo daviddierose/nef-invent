@@ -18,9 +18,6 @@
         ?>
 			 <!--Información por página-->
 			 <div class="container-fluid mt-3" id="formulario">
-				 		<?php
-							include "vistas/modulos/form-in-code.php";
-						 ?>
 						<div class="row mt-5" id="Info">
   							<?php
   									include "vistas/modulos/info-table.php";
