@@ -1,9 +1,10 @@
 /*General*/
 body{
   overflow-x: hidden;
-  font-size: 1rem !important;
+  font-size: 1rem;
   font-family: 'Lato', sans-serif;
 }
+
 .separator{
   margin: 1rem;
   border-bottom: 1px solid #d3cfcf;
@@ -25,7 +26,7 @@ body{
 }
 /*Menú*/
 .vertical-nav{
-  background: #4E4E4E;
+  background-color: #fff;
   min-width: 17rem;
   width: 17rem;
   height: 100vh;
@@ -34,21 +35,21 @@ body{
   left: 0;
   box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
   transition: all 0.4s;
-  overflow: hidden;
+  overflow: auto;
+  z-index: 99;
 }
 #sidebar.active{
   margin-left: -100%;
 }
 /*Info Colector*/
-#colectInfo, #configInfo{
-  font-size: 0.85rem;
+#colectId{
+  font-size: 0.95rem;
   font-weight: bold;
 }
-#colectInfo p span, #configInfo p span{
+#colectId p span{
   font-weight: normal;
 }
-#colectInfo p, #configInfo p{
-  color: #f8f9fad9;
+#colectId p{
   margin-bottom: 0px;
   padding-bottom: 0px;
 }
@@ -60,17 +61,34 @@ body{
 .nav-link{
   text-transform: capitalize;
 }
-.nav-link:hover, #exitLink:hover{
+.nav-link:hover, #exitLink:hover, .collapsebotton:hover{
   background: #aaa;
   color: #fff!important;
   border-top-right-radius:25px;
   border-bottom-right-radius: 25px;
 }
+
 #sidebar ul li .active{
   color: #2c2c2c;
 }
 .text-primary{
   color: #7579e7;
+}
+
+/*Menu admin*/
+.menu-admin-padding{
+  padding: 0.5rem 1rem 0.5rem 0;
+}
+.separator-tittle{
+  margin: 0.1rem 1rem 0.5rem 1rem;
+  border-bottom: 1px solid #d3cfcf;
+}
+
+.btn-switch{
+  font-size: 0.6rem!important;
+  text-align: center;
+  width: 2.2rem;
+  padding: 0.6rem 0;
 }
 
 /*contenido*/
@@ -93,23 +111,6 @@ body{
   font-size: 0.5rem;
 }
 
-/*@media(max-width: 768px){
-  #sidebar{
-    margin-left: -17rem;
-    }
-  #sidebar.active{
-    margin-left: 0;
-  }
-  #content{
-    width: 100%;
-    margin: 0;
-  }
-  #content.active{
-    margin-left: 17rem;
-    width: calc(100%-17rem);
-  }
-
-}*/
 /*Alertas*/
 .alertsRow, #loading-screen{
   display: none;
@@ -125,27 +126,10 @@ body{
     height: 5rem;
   }
 
-  .form-control-lg, .custom-select-lg {
-    height: : 5rem!important;
-    font-size: 2.5rem!important;
-  }
-
   option{
     font-size: 1rem;
   }
 
-  #btn-login, #btn-save-config{
-    font-size: 2.3rem!important;
-  }
-
-  h1{
-    font-size: 3.5rem!important;
-  }
-
-  .alertsRow{
-    font-size: 3.5rem;
-    text-transform: uppercase;
-  }
 }*/
 
 

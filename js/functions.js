@@ -41,7 +41,6 @@ class alerts{
   static hideLoadingScreen(){
     $('#loading-screen').hide();
   }
-
 }
 
 
@@ -52,12 +51,30 @@ class configColectorC{
     this.config = config;
   }
 
-  saveColectorConfig(){
+  static getColector(type){
+      let colectConfigFun;
+      if(localStorage.getItem(type)){
+        colectConfigFun = JSON.parse(localStorage.getItem(type));
+      }else{
+        colectConfigFun = [];
+      }
+        return colectConfigFun;
+  }
+
+  static saveColectorConfig(conIn, conLabel){
+    let colectConfigSave = [];
+    colectConfigSave.push(parseInt(conIn));
+    colectConfigSave.push(parseInt(conLabel));
+    localStorage.setItem("colectConfig", JSON.stringify(colectConfigSave));
+  }
+
+  saveColectorId(){
+      let type = 'colectConfig';
       let colectConfigSave = [];
       colectConfigSave.push(parseInt(this.colect));
       colectConfigSave.push(parseInt(this.config));
-      localStorage.setItem("colectConfig", JSON.stringify(colectConfigSave));
-      configColectorC.getColectorConfig();
+      localStorage.setItem(type, JSON.stringify(colectConfigSave));
+      let colectConfig = configColectorC.getColector(type);
       if(colectConfig[0] == this.colect && colectConfig[1] == this.config){
         const alertSaveConfi = new alerts("alert-success", `La configuración ha
                                 sido guardada con exito.`, 3000);
@@ -69,37 +86,16 @@ class configColectorC{
       }
   }
 
-  static getColectorConfig(){
-      let colectConfigFun;
-      if(localStorage.getItem("colectConfig")){
-        colectConfigFun = JSON.parse(localStorage.getItem("colectConfig"));
-      }else{
-        colectConfigFun = [];
-      }
-        return colectConfigFun;
-  }
-
-  static showColectorConfig(){
+  static showColector(){
       let config;
-      let colectConfig = configColectorC.getColectorConfig();
-      if(colectConfig[1] == 1){
-        config = "Ingreso por Par";
-      }else if (colectConfig[1] == 2){
-        config = "Ingreso por Lote";
-          console.log(colectConfig);
-      }else{
-        config = "No Configurado";
-      }
-      $("#configInfo").html(`<p>Config: <span>${config}</span></p>`);
-      $("#colectInfo").html(`<p>Colector: <span>${colectConfig[0]}</span></p>`);
+      let colectConfig = configColectorC.getColector("colectConfig");
+      let colectId = configColectorC.getColector("aBc");
+        console.log(colectConfig);
+      $("#select-config-In").val(colectConfig[0]);
+      $("#select-config-label").val(colectConfig[1]);
 
-      if(!!document.getElementById("select-config")){
-        if(colectConfig.length == 2){
-          $("#select-colectName").val(colectConfig[0]);
-          $("#select-config").val(colectConfig[1]);
-        }
-      }
-  }
+      $("#colectId").html(`<p>ID: <span class="text-capitalize">${colectId[1]}</span></p>`);
+    }
 
   static numberColector(){
       let col = "colector";
@@ -139,6 +135,47 @@ class configColectorC{
       });
   }
 
+  static reviewId(){
+    let error;
+    alerts.showLoadingScreen();
+    if(localStorage.getItem('aBc')){
+      let id = configColectorC.getColector('aBc');
+      let codeRegIn = id[0];
+      const reviewIdPromise = new Promise((resolve, reject)=>{
+        $.post("connection/connection.php", {codeRegIn}, function(response){})
+        .done(function(response){
+          let res = JSON.parse(response);
+          if(res == true){
+            resolve();
+          }else{
+            reject(res);
+          }
+        }).fail(function(response){
+            reject();
+        });
+      });
+
+      reviewIdPromise.then(res =>{
+        alerts.hideLoadingScreen();
+      }).catch(err =>{
+        alerts.hideLoadingScreen();
+        const alertReviewID = new alerts('alert-danger', err, 5000);
+        alertReviewID.showAlerts();
+        setTimeout(()=>{
+          location.replace('?ruta=login');
+        },5000);
+      });
+    }else{
+      console.log('no está');
+      const alertReviewIDNo = new alerts('alert-danger', `Colector no configurado,
+                                  Comunicate con el administrador.`, 5000);
+      alertReviewIDNo.showAlerts();
+      setTimeout(()=>{
+        location.replace('?ruta=login');
+      },5000);
+    }
+  }
+
 }
 
 class codesC{
@@ -149,7 +186,8 @@ class codesC{
   introduceCode(){
     let codeI = [];
     let codeJoin, amount;
-    let colectConfig = configColectorC.getColectorConfig();
+    let colectConfig = configColectorC.getColector('colectConfig');
+    console.log(colectConfig);
     codeJoin = codeKeyComplete.join("");
     if(codeJoin.length == 0){
       const alertEmptyCode = new alerts("alert-danger", `No puedes
@@ -158,9 +196,9 @@ class codesC{
     }else{
       let codes = codesC.getCodes();
       if(codes.length<500){
-        if(colectConfig[1] == 1){
+        if(colectConfig[0] == 1){
           amount = parseInt(1);
-        }else if(colectConfig[1] == 2){
+        }else if(colectConfig[0] == 2){
           amount = parseInt(prompt("Ingrese la cantidad de pares", "0"));
         }else{
           alertNoConfig.showAlerts();
@@ -234,7 +272,7 @@ class codesC{
 
 static saveCodesList(){
     let codes = codesC.getCodes();
-    let colectConfig = configColectorC.getColectorConfig();
+    let colectConfig = configColectorC.getColector("colectConfig");
     if (codes.length >= 1) {
       let option = confirm(`¿Estás seguro de guardar el listado de códigos?`);
       if(option == true){
@@ -382,6 +420,26 @@ function cleanCode(code){
 }
 
 function ajustarTamaño() {
+  md = new MobileDetect(window.navigator.userAgent);
+  if(md.os() == "AndroidOS"){
+    /*General*/
+    $('h1').css('font-size','3.5rem');
+    $(document.body).css('font-size', '2.2rem');
+    /*sidebar*/
+    $('#sidebar').css('width', $(window).width()).css('height', $(window).height());
+    $('#sidebarCollapseM').removeClass('d-none');
+    $('.logo').css('width', '25%');
+    /*Formularios*/
+    $('.col-sm-6').addClass('col-sm-12').removeClass('col-sm-6');
+    $('.form-control').addClass('form-control-lg').removeClass('form-control');
+    $('.form-control-lg, .custom-select').css('font-size','2.8rem')
+    .css('height', '6rem');
+    $('.btn-azulSec').addClass('btn-lg').css('text-transform','uppercase');
+    $('.btn-lg').removeClass('py-2').addClass('py-3').css('font-size', '2.8rem');
+    /*Alerts*/
+    $('.alertsRow').css('font-size','3.5rem').css('text-transform','uppercase');
+  }
+
   if($("#form-row-ajust").length > 0){
     let heightR = $(window).height();
     let heightD = $("#login-form-div").height() || $("#alertBad").height() || $("#alertOk").height() ;

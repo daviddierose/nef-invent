@@ -1,3 +1,7 @@
+<?php
+	session_start();
+	session_destroy();
+ ?>
 <!DOCTYPE html>
 <html lang="es" dir="ltr">
   <?php
@@ -19,11 +23,6 @@
   </body>
 </html>
 <?php
-  session_start();
-  if(isset($_SESSION["Ingreso"])){
-    session_destroy();
-  }
-
   $ingreso = new AdminC();
   $ingreso -> IngresoC();
  ?>

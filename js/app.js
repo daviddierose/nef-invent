@@ -8,7 +8,10 @@ const alertNoConfig = new alerts("alert-danger", `El colector no esta
                       Configurado. Pidele a tu administrador que seleccione
                       una configuración para el equipo.`, 5000);
 
+
+
  $(document).ready(function () {
+    //configColectorC.reviewId();
     const pDocumentReady = new Promise((resolve, reject)=>{
         configColectorC.numberColector();
         resolve();
@@ -16,7 +19,8 @@ const alertNoConfig = new alerts("alert-danger", `El colector no esta
     pDocumentReady.then(res =>{
       let codes;
       ajustarTamaño();
-      configColectorC.showColectorConfig();
+      configColectorC.showColector();
+
       if(!!document.getElementById("select-correlative-No")){
         let colectorRequest = configColectorC.getColectorConfig();
         correlativeList(colectorRequest[0]);
@@ -24,12 +28,9 @@ const alertNoConfig = new alerts("alert-danger", `El colector no esta
       }else{
         codes = codesC.getCodes();
       }
+
         table(codes, "reverse");
-        md = new MobileDetect(window.navigator.userAgent);
-        if(md.os() == "AndroidOS"){
-          $('#sidebar').css('width', $(window).width()).css('height', $(window).height());
-          $('#sidebarCollapseM').toggleClass('d-none');
-        }
+
     }).catch(err =>{
       console.log("no");
     });
@@ -78,28 +79,29 @@ const alertNoConfig = new alerts("alert-danger", `El colector no esta
             }
       });*/
 
-      $(document).on("click", "#btn-save-config", function(event){
-        let colect = $("#select-colectName").val();
-        let config = $("#select-config").val();
-        const saveConfig = new configColectorC(colect, config);
-        saveConfig.saveColectorConfig();
-      });
-
       $("#select-correlative-No").change(function(){
         let cor = $(this).val();
           callList(cor);
         });
 
       $(document).on("click", "#deleteCodesRev", function(){
+        event.preventDefault();
         let cor = $("#select-correlative-No").val();
         codesC.deleteCodesRev(cor);
         $('.navbar-toggler').trigger('click');
       });
 
       $(document).on('click', '.sidebarCollapse', function(){
+        event.preventDefault();
         $('#sidebar, #content').toggleClass('active');
         if(md.os() == "AndroidOS"){
           $('page-content').toggleClass('d-none');
           }
         });
+
+        $("#select-config-In, #select-config-label").change(function(){
+          let configIn = $('#select-config-In').val();
+          let label = $('#select-config-label').val();
+              configColectorC.saveColectorConfig(configIn, label);
+          });
 });

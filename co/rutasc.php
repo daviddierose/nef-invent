@@ -66,6 +66,17 @@ class rutasControlador{
     echo $respuesta;
   }
 
+  public function appC(){
+    if(isset($_GET["ruta"])){
+      $rutas = $_GET["ruta"];
+    }
+    else{
+      $rutas = "index";
+    }
+
+    $respuesta = Modelo::appM($rutas);
+    echo $respuesta;
+  }
 }
 
 

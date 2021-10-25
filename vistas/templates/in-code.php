@@ -1,10 +1,8 @@
-<!DOCTYPE html>
 <?php
 	session_start();
-	if(isset($_SESSION["Ingreso"])){
-		 	session_destroy();
-		}
+	session_destroy();
  ?>
+<!DOCTYPE html>
 <html lang="es" dir="ltr">
 	<?php
 		include "vistas/modulos/head.php";
@@ -20,7 +18,10 @@
         ?>
 			 <!--Información por página-->
 			 <div class="container-fluid mt-3" id="formulario">
-  					<div class="row mt-5" id="Info">
+				 		<?php
+							include "vistas/modulos/form-in-code.php";
+						 ?>
+						<div class="row mt-5" id="Info">
   							<?php
   									include "vistas/modulos/info-table.php";
   									include "vistas/modulos/table.php"

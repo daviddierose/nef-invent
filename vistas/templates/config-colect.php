@@ -4,7 +4,7 @@
     if($_SESSION["Ingreso"]==true){
     }
   }else{
-    header("location:index.php?ruta=in-code");
+    header("location:index.php?ruta=login");
   }
 
  ?>

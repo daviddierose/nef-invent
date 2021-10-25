@@ -1,3 +1,7 @@
+<?php
+	session_start();
+	session_destroy();
+ ?>
 <!DOCTYPE html>
 <html lang="es" dir="ltr">
   <?php
@@ -13,7 +17,7 @@
        include "vistas/modulos/boton-menu.php";
       ?>
      <!--Información por página-->
-     <div class="container-fluid mt-5">
+     <div class="container-fluid mt-0">
        <?php
           include "vistas/modulos/review-form.php";
         ?>
@@ -26,9 +30,3 @@
    </div>
   </body>
 </html>
-<?php
-  session_start();
-  if(isset($_SESSION["Ingreso"])){
-      session_destroy();
-    }
- ?>

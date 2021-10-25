@@ -18,13 +18,29 @@
     $codesV = new codigosC();
     $codesV -> readCodesC($correlative);
   }
+  else if(isset($_POST['corDel'])){
+    $correlativeDel = new codigoC();
+    $correlativeDel -> deletecCodesCorrelative();
+  }
   else if(isset($_POST["col"])){
     $colectorsV = new colectorC();
     $colectorsV -> readColectorsLenghtC();
   }
-  else if(isset($_POST['corDel'])){
-    $correlativeDel = new codigoC();
-    $correlativeDel -> deletecCodesCorrelative();
+  else if(isset($_POST['colToggle']) && isset($_POST['staToggle'])){
+    $colector = $_POST['colToggle'];
+    $status = $_POST['staToggle'];
+    $colectorTV = new colectorC();
+    $colectorTV -> changeColectorStatusC($colector, $status);
+  }
+  else if(isset($_POST['codeReg'])){
+    $codeReg = $_POST['codeReg'];
+    $colectorRV = new colectorC();
+    $colectorRV -> registerColectorC($codeReg);
+  }
+  else if(isset($_POST['codeRegIn'])){
+    $codeRegIn = $_POST['codeRegIn'];
+    $colectorVerifIdV = new colectorC();
+    $colectorVerifIdV -> verificarStatusCodRegC($codeRegIn);
   }
 
  ?>
