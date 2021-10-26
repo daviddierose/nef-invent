@@ -1,7 +1,10 @@
-  <div class="row">
-      <form method="post" action="" class="row g-3" id="">
-        <div class="form-group col-md-12">
-          <input type="text" class="form-control w-100" id="in-Code" placeholder="Usuario" name="usuarioI" required>
-        </div>
-      </form>
-  </div>
+<div class="row">
+  <form class="w-100 mt-1 p-3">
+		<div class="col-sm-6 mx-auto px-2">
+		  <div class="form-group">
+		    <label for="code_product">Codigo Producto</label>
+		    <input type="text" class="form-control form-control" id="code_product" focus>
+		  </div>
+		</div>
+	</form>
+</div>

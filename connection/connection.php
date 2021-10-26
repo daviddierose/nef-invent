@@ -1,6 +1,7 @@
 <?php
   require_once "../co/codigosc.php";
   require_once "../co/colectorc.php";
+  require_once "../co/inventoryc.php";
 
   if(isset($_POST["colector"]) && isset($_POST["codes"])){
     $codes = $_POST["codes"];
@@ -41,6 +42,15 @@
     $codeRegIn = $_POST['codeRegIn'];
     $colectorVerifIdV = new colectorC();
     $colectorVerifIdV -> verificarStatusCodRegC($codeRegIn);
+  }
+  else if(isset($_POST['invent'])){
+    $inventVerifStatusV = new inventoryC();
+    $inventVerifStatusV -> reviewStatusInventoryC();
+  }
+  else if(isset($_POST['codeRegInRev'])){
+    $codeRegInRev = $_POST['codeRegInRev'];
+    $colectIdStatusVerV = new colectorC();
+    $colectIdStatusVerV -> reviewStatusColectIdC($codeRegInRev);
   }
 
  ?>

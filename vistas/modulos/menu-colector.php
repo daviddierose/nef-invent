@@ -14,16 +14,11 @@
       </div>
   </div>
   <div class="form-group mx-2">
-    <label for="colect_name">Tipo de Configuración</label>
+    <label for="colect_name">Tipo de Ingreso</label>
     <select class="custom-select custom-select text-capitalize" id="select-config-In">
          <option value="0">Seleccionar</option>
-         <option value="1">Ingreso por Par</option>
-         <option value="2">Ingreso por Lote</option>
-    </select>
-    <select class="custom-select custom-select text-capitalize mt-1" id="select-config-label">
-         <option value="0">Seleccionar</option>
-         <option value="1">Plastico</option>
-         <option value="2">Nefnodel Secofis</option>
+         <option value="1">Etiquetas Nefnodel</option>
+         <option value="2">Plastico</option>
     </select>
   </div>
   <div class="">

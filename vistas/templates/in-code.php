@@ -17,8 +17,11 @@
          include "vistas/modulos/boton-menu.php";
         ?>
 			 <!--Información por página-->
-			 <div class="container-fluid mt-3" id="formulario">
-						<div class="row mt-5" id="Info">
+			 <?php
+			 		include "vistas/modulos/form-in-code.php";
+			  ?>
+			 <div class="container-fluid mt-1" id="formulario">
+						<div class="row mt-2" id="Info">
   							<?php
   									include "vistas/modulos/info-table.php";
   									include "vistas/modulos/table.php"

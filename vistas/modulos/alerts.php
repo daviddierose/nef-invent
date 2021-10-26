@@ -1,10 +1,10 @@
 <div class="container-fluid fixed-top alertsRow" id="row-alert">
   <div class="row bg-light vh-100">
-    <div class="col-sm-10 m-auto">
-      <div class="alert alert-dismissible fade show p-5" id="Alert" role="alert">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+    <div class="m-auto" id="Alert">
+      <div class="pt-5 px-5 text-uppercase" id="Alert-text">
+      </div>
+      <div class="col-sm-10 mb-5 mt-4 mx-auto text-center">
+        <button class="btn btn-danger d-none" type="button" name="button" id="alert-boton">Aceptar</button>
       </div>
     </div>
   </div>

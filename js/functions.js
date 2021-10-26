@@ -5,7 +5,7 @@ class alerts{
     this.delayTime = delayTime;
   }
   showAlerts(){
-    $(`#Alert`).html(this.text);
+    $(`#Alert-text`).html(this.text);
     $('#Alert').addClass(this.color);
     $('#row-alert').fadeIn(200);
     setTimeout(()=>{
@@ -17,7 +17,7 @@ class alerts{
   showAlertsCountdown() {
     let newText = this.text + `<br>Si intentara de nuevo en: <br><span
                                 id="spanAlert">10</span>`;
-    $(`#Alert`).html(newText);
+    $(`#Alert-text`).html(newText);
     $('#Alert').addClass(this.color);
     $('#row-alert').fadeIn(200);
     let time = 10;
@@ -33,6 +33,22 @@ class alerts{
         $('#Alert').removeClass(this.color);
       },this.delayTime);
   }
+
+  showAlertsBotton(){
+    $(`#Alert-text`).html(this.text);
+    $('#Alert').addClass(this.color);
+    $('#alert-boton').toggleClass('d-none');
+    $('#code_product').blur();
+    $('#row-alert').fadeIn(200);
+    music.play();
+    music.loop =true;
+    alarmaCodeWrong = setInterval(()=>{
+      $('#Alert').toggleClass('alert-danger');
+      $('#Alert').toggleClass('alert-primary');
+      var sta = $('#row-alert').css('display');
+      console.log("1");
+    }, 100);
+}
 
   static showLoadingScreen(){
     $('#loading-screen').show();
@@ -64,7 +80,6 @@ class configColectorC{
   static saveColectorConfig(conIn, conLabel){
     let colectConfigSave = [];
     colectConfigSave.push(parseInt(conIn));
-    colectConfigSave.push(parseInt(conLabel));
     localStorage.setItem("colectConfig", JSON.stringify(colectConfigSave));
   }
 
@@ -92,7 +107,6 @@ class configColectorC{
       let colectId = configColectorC.getColector("aBc");
         console.log(colectConfig);
       $("#select-config-In").val(colectConfig[0]);
-      $("#select-config-label").val(colectConfig[1]);
 
       $("#colectId").html(`<p>ID: <span class="text-capitalize">${colectId[1]}</span></p>`);
     }
@@ -136,7 +150,6 @@ class configColectorC{
   }
 
   static reviewId(){
-    let error;
     alerts.showLoadingScreen();
     if(localStorage.getItem('aBc')){
       let id = configColectorC.getColector('aBc');
@@ -166,7 +179,6 @@ class configColectorC{
         },5000);
       });
     }else{
-      console.log('no está');
       const alertReviewIDNo = new alerts('alert-danger', `Colector no configurado,
                                   Comunicate con el administrador.`, 5000);
       alertReviewIDNo.showAlerts();
@@ -174,6 +186,70 @@ class configColectorC{
         location.replace('?ruta=login');
       },5000);
     }
+  }
+
+  static reviewColectIdStatus(){
+    alerts.showLoadingScreen();
+    if(localStorage.getItem('aBc')){
+      let id = configColectorC.getColector('aBc');
+      let codeRegInRev = id[0];
+      console.log(codeRegInRev);
+      const reviewIdStaPromise = new Promise((resolve, reject)=>{
+        $.post("connection/connection.php", {codeRegInRev}, function(response){})
+        .done(function(response){
+          console.log(response);
+          let res = JSON.parse(response);
+          if(res == true){
+            resolve();
+          }else{
+            reject(res);
+          }
+        }).fail(function(response){
+            reject();
+        });
+      });
+
+      reviewIdStaPromise.then(res =>{
+        alerts.hideLoadingScreen();
+      }).catch(err =>{
+        alerts.hideLoadingScreen();
+        const alertReviewID = new alerts('alert-danger', err, 5000);
+        alertReviewID.showAlerts();
+      });
+    }else{
+      const alertReviewIDStaNo = new alerts('alert-danger', `Colector no configurado,
+                                  Comunicate con el administrador.`, 5000);
+      alertReviewIDStaNo.showAlerts();
+      setTimeout(()=>{
+        location.replace('?ruta=login');
+      },5000);
+    }
+  }
+
+  static reviewInventStatus(){
+    alerts.showLoadingScreen();
+      let invent = "invent";
+      const reviewInventStaPromise = new Promise((resolve, reject)=>{
+        $.post("connection/connection.php", {invent}, function(response){})
+        .done(function(response){
+          let res = JSON.parse(response);
+          if(res == true){
+            resolve();
+          }else{
+            reject(res);
+          }
+        }).fail(function(response){
+            reject();
+        });
+      });
+
+      reviewInventStaPromise.then(res =>{
+        alerts.hideLoadingScreen();
+      }).catch(err =>{
+        alerts.hideLoadingScreen();
+        const alertReviewInvent = new alerts('alert-danger', err, 5000);
+        alertReviewInvent.showAlerts();
+      });
   }
 
 }
@@ -185,26 +261,43 @@ class codesC{
 
   introduceCode(){
     let codeI = [];
-    let codeJoin, amount;
+    let amount;
     let colectConfig = configColectorC.getColector('colectConfig');
-    console.log(colectConfig);
-    codeJoin = codeKeyComplete.join("");
-    if(codeJoin.length == 0){
+    if(this.code.length == 0){
       const alertEmptyCode = new alerts("alert-danger", `No puedes
                             guardar un código vacio.`, 3000);
       alertEmptyCode.showAlerts();
     }else{
       let codes = codesC.getCodes();
       if(codes.length<500){
-        if(colectConfig[0] == 1){
-          amount = parseInt(1);
-        }else if(colectConfig[0] == 2){
-          amount = parseInt(prompt("Ingrese la cantidad de pares", "0"));
-        }else{
+        switch (colectConfig[0]) {
+          case 0:
+          const alertNoConfig = new alerts("alert-danger", `Tipo de ingreso no seleccionado.
+                                      Abre el menú y selecciona una de las opciones.`, 5000);
           alertNoConfig.showAlerts();
+          return;
+          break;
+          case 1:
+            console.log('caso1')
+            let reviewCode1 = codesC.reviewStructureCode(this.code, colectConfig[0]);
+            if(reviewCode1 == true){
+              amount = parseInt(1);
+            }else{
+              $("#code_product").val("");
+              return;
+            }
+          break;
+          case 2:
+            let reviewCode2 = codesC.reviewStructureCode(this.code, colectConfig[0]);
+            if(reviewCode2 == true){
+              amount = parseInt(prompt("Ingrese la cantidad de pares", "0"));
+            }else{
+              $("#code_product").val("");
+              return;
+            }
+          break;
         }
-        let codeClean = cleanCode(codeJoin);
-        codeI.push(codeClean, amount);
+        codeI.push(this.code, amount, 'text-dark');
         codes.push(codeI);
         localStorage.setItem("codesList", JSON.stringify(codes));
         codes = codesC.getCodes();
@@ -215,7 +308,65 @@ class codesC{
         alertSpacesLimit.showAlerts();
       }
     }
-    codeKeyComplete = [];
+    $("#code_product").val("");
+  }
+
+  static reviewStructureCode(code, config){
+    switch (config) {
+      case 1:
+        const regCode1 = new RegExp(/[0-9]{11}-{1}[0-9]{1}[A-Za-z]{1}[0-9]{5}\s{2}/);
+        const regCode2 = new RegExp(/[0-9]{11}-{1}[0-9]{1}[A-Za-z]{1}[0-9]{5}[.]{1}5{1}/);
+        const regCode3 = new RegExp(/[0-9]{11}-{1}[0-9]{1}[A-Za-z]{1}[0-9]{3}[A-za-z]+\s+/);
+        let length = code.length;
+        if(length == 21 && regCode1.test(code)){
+            console.log(length);
+            console.log('1');
+            return true;
+        }else if(length == 21 && regCode2.test(code)){
+            console.log('2');
+            return true;
+        }else if(length == 21 && regCode3.test(code)){
+            return true;
+        }
+        else{
+            const alertErrorStCode1 = new alerts("alert-danger", `El código no comple
+                                        con los parametros necesarios`, 0);
+            alertErrorStCode1.showAlertsBotton();
+            return false;
+          }
+        break;
+      case 2:
+        const regCode4 = new RegExp(/[0-9]{13}/);
+        if(regCode4.test(code)){
+          return true
+        }else{
+          const alertErrorStCode2 = new alerts("alert-danger", `El código no comple
+                                      con los parametros necesarios`, 0);
+          alertErrorStCode2.showAlertsBotton();
+          return false;
+        }
+        break;
+    }
+    const regCode1 = new RegExp(/[0-9]{11}-{1}[0-9]{1}[A-Za-z]{1}[0-9]{5}\s{2}/);
+    const regCode2 = new RegExp(/[0-9]{11}-{1}[0-9]{1}[A-Za-z]{1}[0-9]{5}[.]{1}5{1}/);
+    const regCode3 = new RegExp(/[0-9]{11}-{1}[0-9]{1}[A-Za-z]{1}[0-9]{3}[A-za-z]+\s+/);
+    let length = code.length;
+    if(length == 21 && regCode1.test(code)){
+        console.log(length);
+        console.log('1');
+        return true;
+    }else if(length == 21 && regCode2.test(code)){
+        console.log('2');
+        return true;
+    }else if(length == 21 && regCode3.test(code)){
+        return true;
+    }
+    else{
+        const alertErrorStCode = new alerts("alert-danger", `El código no comple
+                                    con los parametros necesarios`, 0);
+        alertErrorStCode.showAlertsBotton();
+        return false;
+      }
   }
 
   static getCodes(){
@@ -223,7 +374,7 @@ class codesC{
     if(localStorage.getItem("codesList")){
       codesListRec = JSON.parse(localStorage.getItem("codesList"));
     }else{
-      codesListRec = [];
+      codesListRec = [0];
       localStorage.setItem("codesList", JSON.stringify(codesListRec));
     }
       return codesListRec;
@@ -357,14 +508,17 @@ static saveCodesList(){
 
 function table(codes, sequence){
   let length;
-  if(sequence == "reverse"){
-    codes = codes.reverse();
-    length = codes.length;
-  }else if(sequence == "direct"){
-    length = 1;
-    codes = codes;
+  switch (sequence) {
+    case "reverse":
+      codes = codes.reverse();
+      length = codes.length;
+      break;
+    case "direct":
+      length = 1;
+      codes = codes;
+      break;
+
   }
-  console.log(codes);
   let elementTable = "";
   let numeroCode = 1;
 
@@ -372,7 +526,7 @@ function table(codes, sequence){
     elementTable += `
                     <tr>
                       <td scope="col" class="px-4 py-2">${length}</td>
-                      <td scope="col" class="px-4 py-2">${codes[i][0]}</td>
+                      <td scope="col" class="px-4 py-2 ${codes[i][2]}">${codes[i][0]}</td>
                       <td scope="col" class="px-4 py-2">${codes[i][1]}</td>
                       <td scope="col" class="px-4 boton-delete p-2 text-center text-danger"><i class="fas fa-trash-alt delete" code="${length}"></i></td>
                     </tr>`;
@@ -413,11 +567,11 @@ function callList(correlative){
       });
   }
 
-function cleanCode(code){
+/*function cleanCode(code){
   const regEx = new RegExp(/STK|stk|sTk|DCN|dcn|dCn,/, 'g');
     code = code.replace(regEx, '');
   return code;
-}
+}*/
 
 function ajustarTamaño() {
   md = new MobileDetect(window.navigator.userAgent);

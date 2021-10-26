@@ -63,7 +63,23 @@
       }
       $jsonString = json_encode($respuesta);
       echo $jsonString;
-  }
+    }
+
+    public function reviewStatusColectIdC($codeRegInRev){
+      $codeReg = desencriptar($codeRegInRev);
+      $tables = array('codigos_registro','colectores');
+      $verifCodeReg = colectorM::verificarStatusCodRegM($tables, $codeReg);
+      $length = count($verifCodeReg);
+      if($length == 0){
+        $respuesta = "El colector está mal configurado, habla con tu departamente ténico.";
+      }else{
+        if($verifCodeReg[0]['status'] == 1){
+          $respuesta = $verifCodeReg;
+        }
+      }
+      $jsonString = json_encode($respuesta);
+      echo $jsonString;
+    }
 }
 
  ?>

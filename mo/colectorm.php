@@ -69,7 +69,17 @@
       $pst->execute();
       $verif = $pst->fetchAll();
       unset($pdo);
-      return($verif);
+      return ($verif);
+    }
+
+    static public function reviewStatusColectIdM($table, $codeReg){
+      $pdo = new ConexionBD();
+      $pst = $pdo->bd->prepare("SELECT status FROM $table WHERE codigo=:codigo");
+      $pst->bindParam(':codigo',$codeReg, PDO::PARAM_STR);
+      $pst->execute();
+      $verif = $pst->fetchAll();
+      unset($pdo);
+      return $verif;
     }
   }
  ?>
