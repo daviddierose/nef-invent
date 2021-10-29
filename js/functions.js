@@ -67,100 +67,73 @@ class configColectorC{
     this.config = config;
   }
 
-  static getColector(type){
+  static getConfig(){
       let colectConfigFun;
-      if(localStorage.getItem(type)){
-        colectConfigFun = JSON.parse(localStorage.getItem(type));
+      if(localStorage.getItem('config')){
+        colectConfigFun = JSON.parse(localStorage.getItem('config'));
       }else{
-        colectConfigFun = [];
+        let colectConfigCreate = [{'colect':{
+                              'codeReg':'',
+                              'codeDevice':'',
+                              'colectName':'',
+                              'colectStatus':0,
+                              'input': 0},
+                            'inventory':{
+                              'inventStatus':0,
+                              'inventBranchOffice':'',
+                              'inventId': 0}}];
+        localStorage.setItem("config", JSON.stringify(colectConfigCreate));
       }
         return colectConfigFun;
+   }
+
+  static saveInputConfig(conIn){
+    let config = configColectorC.getConfig();
+    config[0]['colect']['input'] = conIn;
+    localStorage.setItem("config", JSON.stringify(config));
   }
 
-  static saveColectorConfig(conIn, conLabel){
-    let colectConfigSave = [];
-    colectConfigSave.push(parseInt(conIn));
-    localStorage.setItem("colectConfig", JSON.stringify(colectConfigSave));
-  }
+  static showConfig(){
+      let config = configColectorC.getConfig("config");
+      $("#select-config-In").val(config[0]['colect']['input']);
 
-  saveColectorId(){
-      let type = 'colectConfig';
-      let colectConfigSave = [];
-      colectConfigSave.push(parseInt(this.colect));
-      colectConfigSave.push(parseInt(this.config));
-      localStorage.setItem(type, JSON.stringify(colectConfigSave));
-      let colectConfig = configColectorC.getColector(type);
-      if(colectConfig[0] == this.colect && colectConfig[1] == this.config){
-        const alertSaveConfi = new alerts("alert-success", `La configuración ha
-                                sido guardada con exito.`, 3000);
-        alertSaveConfi.showAlerts();
-      }else{
-        const alertDontSaveConfi = new alerts("alert-danger", `No se pudo guardar
-                                    la configuración. Intenta de Nuevo.`, 3000);
-        alertDontSaveConfi.showAlerts();
-      }
-  }
-
-  static showColector(){
-      let config;
-      let colectConfig = configColectorC.getColector("colectConfig");
-      let colectId = configColectorC.getColector("aBc");
-        console.log(colectConfig);
-      $("#select-config-In").val(colectConfig[0]);
-
-      $("#colectId").html(`<p>ID: <span class="text-capitalize">${colectId[1]}</span></p>`);
+      $("#colectId").html(`<p>ID: <span class="text-capitalize">${config[0]['colect']['colectName']}</span></p>`);
     }
 
-  static numberColector(){
-      let col = "colector";
-
-      const promiseNC = new Promise((resolve, reject)=>{
-        alerts.showLoadingScreen();
-        $.post("connection/connection.php", {col}, function(response){
-          let resp = JSON.parse(response);
-          resp = parseInt(resp);
-        }).done(function (resp){
-            resolve(resp);
-        }).fail(function (xhr, textStatus, errorThrown){
-            reject();
-          });
-      });
-
-      promiseNC.then(res =>{
-        numberColectorInfo = res;
-        alerts.hideLoadingScreen();
-      }).catch(err =>{
-        alerts.hideLoadingScreen();
-        const promiseErrAlert = new Promise((resolve, reject)=>{
-          const alertErrorConection = new alerts('alert-danger', `No fue posible
-                                        realizar conexión con el servidor.`, 10000);
-          alertErrorConection.showAlertsCountdown();
-          setTimeout(()=>{
-            resolve();
-          },9000);
-        });
-        promiseErrAlert.then(res =>{
-        configColectorC.numberColector();
-          const alertSuccConection = new alerts('alert-success', `Conexión realizada
-                                        con éxito.`, 3000);
-          alertSuccConection.showAlerts();
-        })
-
-      });
-  }
-
-  static reviewId(){
+  static reviewStatus(){
     alerts.showLoadingScreen();
-    if(localStorage.getItem('aBc')){
-      let id = configColectorC.getColector('aBc');
-      let codeRegIn = id[0];
+    let config = configColectorC.getConfig();
+    if(config[0]["colect"]["codeReg"].length == 44
+    && config[0]["colect"]["codeDevice"].length == 44){
+      let codeReg = config[0]["colect"]["codeReg"];
+      let codeDevice = config[0]["colect"]["codeDevice"];
+      let info = {
+        codeRegIn: codeReg,
+        codeDeviceIn: codeDevice,
+      }
       const reviewIdPromise = new Promise((resolve, reject)=>{
-        $.post("connection/connection.php", {codeRegIn}, function(response){})
+        $.post("connection/connection.php", info, function(response){})
         .done(function(response){
+          console.log(response);
           let res = JSON.parse(response);
-          if(res == true){
-            resolve();
-          }else{
+
+          config[0]['colect']['colectStatus'] = res['resCol'];
+          config[0]['inventory']['inventId'] = res['resInvId'];
+          config[0]['inventory']['inventStatus'] = res['resInv'];
+          config[0]['inventory']['inventBranchOffice'] = res['resInvBranch'];
+          localStorage.setItem("config", JSON.stringify(config));
+
+          if(res['resCodeReg'] == false
+          || res['resCol'] == 0
+          || res['resInv'] == 0){
+            reject(res);
+          }
+          else if(res['resCodeReg'] == true
+          && res['resCol'] == 1
+          && res['resInv'] == 1){
+            resolve(res);
+          }
+          else{
             reject(res);
           }
         }).fail(function(response){
@@ -170,13 +143,22 @@ class configColectorC{
 
       reviewIdPromise.then(res =>{
         alerts.hideLoadingScreen();
+        $('#code_product').removeAttr('readonly').focus();
       }).catch(err =>{
+        console.log(err);
         alerts.hideLoadingScreen();
-        const alertReviewID = new alerts('alert-danger', err, 5000);
+        if(err['resInv'] == 0){
+          let codes = [];
+          localStorage.setItem("codesList", JSON.stringify(codes));
+        }
+        const alertReviewID = new alerts('alert-danger', err['message'], 5000);
         alertReviewID.showAlerts();
-        setTimeout(()=>{
-          location.replace('?ruta=login');
-        },5000);
+
+        if(err['resCodeReg']== false){
+          setTimeout(()=>{
+            location.replace('?ruta=login');
+          },5000);
+        }
       });
     }else{
       const alertReviewIDNo = new alerts('alert-danger', `Colector no configurado,
@@ -188,71 +170,8 @@ class configColectorC{
     }
   }
 
-  static reviewColectIdStatus(){
-    alerts.showLoadingScreen();
-    if(localStorage.getItem('aBc')){
-      let id = configColectorC.getColector('aBc');
-      let codeRegInRev = id[0];
-      console.log(codeRegInRev);
-      const reviewIdStaPromise = new Promise((resolve, reject)=>{
-        $.post("connection/connection.php", {codeRegInRev}, function(response){})
-        .done(function(response){
-          console.log(response);
-          let res = JSON.parse(response);
-          if(res == true){
-            resolve();
-          }else{
-            reject(res);
-          }
-        }).fail(function(response){
-            reject();
-        });
-      });
-
-      reviewIdStaPromise.then(res =>{
-        alerts.hideLoadingScreen();
-      }).catch(err =>{
-        alerts.hideLoadingScreen();
-        const alertReviewID = new alerts('alert-danger', err, 5000);
-        alertReviewID.showAlerts();
-      });
-    }else{
-      const alertReviewIDStaNo = new alerts('alert-danger', `Colector no configurado,
-                                  Comunicate con el administrador.`, 5000);
-      alertReviewIDStaNo.showAlerts();
-      setTimeout(()=>{
-        location.replace('?ruta=login');
-      },5000);
-    }
-  }
-
-  static reviewInventStatus(){
-    alerts.showLoadingScreen();
-      let invent = "invent";
-      const reviewInventStaPromise = new Promise((resolve, reject)=>{
-        $.post("connection/connection.php", {invent}, function(response){})
-        .done(function(response){
-          let res = JSON.parse(response);
-          if(res == true){
-            resolve();
-          }else{
-            reject(res);
-          }
-        }).fail(function(response){
-            reject();
-        });
-      });
-
-      reviewInventStaPromise.then(res =>{
-        alerts.hideLoadingScreen();
-      }).catch(err =>{
-        alerts.hideLoadingScreen();
-        const alertReviewInvent = new alerts('alert-danger', err, 5000);
-        alertReviewInvent.showAlerts();
-      });
-  }
-
 }
+
 
 class codesC{
   constructor(code){
@@ -262,7 +181,8 @@ class codesC{
   introduceCode(){
     let codeI = [];
     let amount;
-    let colectConfig = configColectorC.getColector('colectConfig');
+    let config = configColectorC.getConfig('config');
+    let input = parseInt(config[0]['colect']['input']);
     if(this.code.length == 0){
       const alertEmptyCode = new alerts("alert-danger", `No puedes
                             guardar un código vacio.`, 3000);
@@ -270,7 +190,7 @@ class codesC{
     }else{
       let codes = codesC.getCodes();
       if(codes.length<500){
-        switch (colectConfig[0]) {
+        switch (input) {
           case 0:
           const alertNoConfig = new alerts("alert-danger", `Tipo de ingreso no seleccionado.
                                       Abre el menú y selecciona una de las opciones.`, 5000);
@@ -279,7 +199,7 @@ class codesC{
           break;
           case 1:
             console.log('caso1')
-            let reviewCode1 = codesC.reviewStructureCode(this.code, colectConfig[0]);
+            let reviewCode1 = codesC.reviewStructureCode(this.code, input);
             if(reviewCode1 == true){
               amount = parseInt(1);
             }else{
@@ -288,7 +208,7 @@ class codesC{
             }
           break;
           case 2:
-            let reviewCode2 = codesC.reviewStructureCode(this.code, colectConfig[0]);
+            let reviewCode2 = codesC.reviewStructureCode(this.code, input);
             if(reviewCode2 == true){
               amount = parseInt(prompt("Ingrese la cantidad de pares", "0"));
             }else{
@@ -423,57 +343,59 @@ class codesC{
 
 static saveCodesList(){
     let codes = codesC.getCodes();
-    let colectConfig = configColectorC.getColector("colectConfig");
+    let config = configColectorC.getConfig("config");
     if (codes.length >= 1) {
-      let option = confirm(`¿Estás seguro de guardar el listado de códigos?`);
-      if(option == true){
-        if(colectConfig[0] > 0 && colectConfig[0] <= numberColectorInfo){
-          info = {
-            codes: codes,
-            colector: colectConfig[0],
-          }
-          const promiseSaveCodes = new Promise((resolve, reject)=>{
-            alerts.showLoadingScreen();
-            $.post("connection/connection.php", info, function(response){
-            }).done(function(response){
-                    resolve(response);
-                }).fail(function(xhr, textStatus, errorThrown){
-                    reject();
-                });
-          });
-
-          promiseSaveCodes.then(res =>{
-            res = JSON.parse(res);
-            if(res[0] == true){
-              codesC.deleteCodeList();
-              const alertSaveList = new alerts("alert-success", `Se ha guardado
-                                    el listado con éxito en el correlativo
-                                    ${res[1]}.`, 3000);
-              alertSaveList.showAlerts();
-              alerts.hideLoadingScreen();
-            }else{
-              const alertSaveSerPro = new alerts("alert-danger", `Se had detectado un
-                                      problema. Contacto con tu administrador`,3000);
-              alertSaveSerPro.showAlerts();
-              alerts.hideLoadingScreen();
+      if(config[0]['colect']['colectStatus'] == 1){
+        let option = confirm(`¿Estás seguro de guardar el listado de códigos?`);
+        if(option == true){
+            info = {
+              codes: codes,
+              codeReg: config[0]['colect']['codeReg'],
+              codeDevice: config[0]['colect']['codeDevice'],
             }
-          }).catch(err =>{
-            console.log(err);
-            const alertDontSaveList = new alerts("alert-danger", `No se pudo
-                                      guardar el listado debido a un problema de
-                                      conexión. Intenta de nuevo.`, 3000);
-            alertDontSaveList.showAlerts();
-            alerts.hideLoadingScreen();
-          });
+            const promiseSaveCodes = new Promise((resolve, reject)=>{
+              alerts.showLoadingScreen();
+              $.post("connection/connection.php", info, function(response){
+              }).done(function(response){
+                  console.log(response);
+                      resolve(response);
+                  }).fail(function(xhr, textStatus, errorThrown){
+                      reject();
+                  });
+            });
+
+            promiseSaveCodes.then(res =>{
+              res = JSON.parse(res);
+              if(res[0] == true){
+                codesC.deleteCodeList();
+                const alertSaveList = new alerts("alert-success", `Se ha guardado
+                                      el listado con éxito en el correlativo
+                                      ${res[1]}.`, 3000);
+                alertSaveList.showAlerts();
+                alerts.hideLoadingScreen();
+              }else{
+                const alertSaveSerPro = new alerts("alert-danger", `Se had detectado un
+                                        problema. Contacto con tu administrador`,3000);
+                alertSaveSerPro.showAlerts();
+                alerts.hideLoadingScreen();
+              }
+            }).catch(err =>{
+              const alertDontSaveList = new alerts("alert-danger", `No se pudo
+                                        guardar el listado debido a un problema de
+                                        conexión. Intenta de nuevo.`, 3000);
+              alertDontSaveList.showAlerts();
+              alerts.hideLoadingScreen();
+            });
         }
-        else{
-          alertNoConfig.showAlerts();
-        }
+      }else{
+        const alert = new alerts("alert-danger", `No puedes guardar este listado.
+                                  Tu colector está deshabilitado.`, 3000);
+        alert.showAlerts();
       }
     }else {
-      const alertSaveEmptyList = new alerts("alert-danger", `No puedes guardar
+      const alert = new alerts("alert-danger", `No puedes guardar
                                   un listado vacio.`, 3000);
-      alertSaveEmptyList.showAlerts();
+      alert.showAlerts();
     }
   }
 
@@ -492,9 +414,9 @@ static saveCodesList(){
         });
 
         promiseDeleteCodesRev.then(res =>{
-          console.log('bien');
+
         }).catch(err =>{
-          console.log(err);
+
         });
       }
     }else{

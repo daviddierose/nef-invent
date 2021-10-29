@@ -1,21 +1,25 @@
 <?php
-  require_once "../co/codigosc.php";
-  require_once "../co/colectorc.php";
-  require_once "../co/inventoryc.php";
+  require_once '../co/codigosc.php';
+  require_once '../co/colectorc.php';
+  require_once '../co/inventoryc.php';
 
-  if(isset($_POST["colector"]) && isset($_POST["codes"])){
-    $codes = $_POST["codes"];
-    $colector = $_POST["colector"];
+  if(isset($_POST['codeReg'])
+  && isset($_POST['codes'])
+  && isset($_POST['codeDevice'])
+  ){
+    $codes = $_POST['codes'];
+    $codeReg = $_POST['codeReg'];
+    $codeDevice = $_POST['codeDevice'];
     $codesV = new codigosC();
-    $codesV -> writeCodeC($colector, $codes);
+    $codesV -> writeCodeC($codes, $codeReg, $codeDevice);
   }
-  else if(isset($_POST["colectorRequest"])){
-    $colector = $_POST["colectorRequest"];
+  else if(isset($_POST['colectorRequest'])){
+    $colector = $_POST['colectorRequest'];
     $correlativeV = new codigosC();
     $correlativeV -> readCorrelativeC($colector);
   }
-  else if(isset($_POST["correlative"])){
-    $correlative = $_POST["correlative"];
+  else if(isset($_POST['correlative'])){
+    $correlative = $_POST['correlative'];
     $codesV = new codigosC();
     $codesV -> readCodesC($correlative);
   }
@@ -23,7 +27,7 @@
     $correlativeDel = new codigoC();
     $correlativeDel -> deletecCodesCorrelative();
   }
-  else if(isset($_POST["col"])){
+  else if(isset($_POST['col'])){
     $colectorsV = new colectorC();
     $colectorsV -> readColectorsLenghtC();
   }
@@ -33,24 +37,18 @@
     $colectorTV = new colectorC();
     $colectorTV -> changeColectorStatusC($colector, $status);
   }
-  else if(isset($_POST['codeReg'])){
+  else if(isset($_POST['codeReg']) && isset($_POST['codeDevice'])){
     $codeReg = $_POST['codeReg'];
+    $codeDevice = $_POST['codeDevice'];
     $colectorRV = new colectorC();
-    $colectorRV -> registerColectorC($codeReg);
+    $colectorRV -> registerColectorC($codeReg, $codeDevice);
   }
-  else if(isset($_POST['codeRegIn'])){
+  else if(isset($_POST['codeRegIn'])
+       && isset($_POST['codeDeviceIn'])){
     $codeRegIn = $_POST['codeRegIn'];
+    $codeDeviceIn = $_POST['codeDeviceIn'];
     $colectorVerifIdV = new colectorC();
-    $colectorVerifIdV -> verificarStatusCodRegC($codeRegIn);
-  }
-  else if(isset($_POST['invent'])){
-    $inventVerifStatusV = new inventoryC();
-    $inventVerifStatusV -> reviewStatusInventoryC();
-  }
-  else if(isset($_POST['codeRegInRev'])){
-    $codeRegInRev = $_POST['codeRegInRev'];
-    $colectIdStatusVerV = new colectorC();
-    $colectIdStatusVerV -> reviewStatusColectIdC($codeRegInRev);
+    $colectorVerifIdV -> verificarStatusCodRegC($codeRegIn, $codeDeviceIn);
   }
 
  ?>

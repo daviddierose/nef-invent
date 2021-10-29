@@ -31,9 +31,9 @@
       }
     }
 
-    public function registerColectorC($codeReg){
-      $tables = array('codigos_registro', 'colectores');
-      $verif = colectorM::verificarStatusCodRegM($tables, $codeReg);
+    public function registerColectorC($codeReg, $codeDevice){
+      $table = 'codigos_registro';
+      $verif = colectorM::verificarStatusCodRegM($table, $codeReg);
       $length = count($verif);
       if($length == 0){
         $respuesta = array("El código de registro no es valido.");
@@ -41,7 +41,8 @@
         if($verif[0]['status'] == 1){
           $respuesta = array("El código de registro ya está en uso.");
         }else{
-          $respuesta = colectorM::registerColectorM($tables, $codeReg, $verif);
+          $tables = array('codigos_registro', 'colectores');
+          $respuesta = colectorM::registerColectorM($tables, $codeReg, $verif, $codeDevice);
         }
       }
 
@@ -49,37 +50,49 @@
       echo $jsonString;
     }
 
-    public function verificarStatusCodRegC($codeRegIn){
+    public function verificarStatusCodRegC($codeRegIn, $codeDeviceIn){
+      $respuesta = array(true);
       $codeReg = desencriptar($codeRegIn);
-      $tables = array('codigos_registro', 'colectores');
-      $verif = colectorM::verificarStatusCodRegM($tables, $codeReg);
+      $codeDevice = desencriptar($codeDeviceIn);
+      $table = 'codigos_registro';
+      $verif = colectorM::verificarStatusCodRegM($table, $codeReg);
       $length = count($verif);
       if($length == 0){
-        $respuesta = "El colector está mal configurado, habla con tu departamente ténico.";
+        $respuesta = array('resCodeReg'=> false,
+                           'resCol'=> 0,
+                           'resInv'=> 0,
+                           'resInvId'=>0,
+                           'resInvBranch'=> '',
+                           'message'=>'El colector está mal configurado,
+                                      habla con tu departamente ténico.',
+                            );
       }else{
-        if($verif[0]['status'] == 1){
-          $respuesta = true;
+        if($verif[0]['status'] == 1 && $verif[0]['code_device'] == $codeDevice){
+          $colectStatus = colectorM::reviewStatusColectIdM('colectores', $verif[0]['id']);
+          $inventStatus = colectorM::reviewStatusInventM();
+          if($colectStatus[0]['status'] == 0 || $inventStatus['status'] == 0){
+              $respuesta = array('resCodeReg'=> true,
+                                 'resCol'=> $colectStatus[0]['status'],
+                                 'resInv'=> $inventStatus['status'],
+                                 'resInvId'=> $inventStatus['id'],
+                                 'resInvBranch'=> $inventStatus['sucursal'],
+                                 'message'=>'No puedes ingresar códigos. Es posible que no exista un
+                                            inventario activo o el colector está deshabilitado.',
+                                  );
+          }else if(($colectStatus[0]['status'] == 1 && $inventStatus['status'] == 1)){
+            $respuesta = array('resCodeReg'=> true,
+                               'resCol'=> $colectStatus[0]['status'],
+                               'resInv'=> $inventStatus['status'],
+                               'resInvId'=> $inventStatus['id'],
+                               'resInvBranch'=> $inventStatus['sucursal'],
+                               'message'=>'',
+                              );
+          }
         }
       }
-      $jsonString = json_encode($respuesta);
-      echo $jsonString;
+        $jsonString = json_encode($respuesta);
+        echo $jsonString;
     }
-
-    public function reviewStatusColectIdC($codeRegInRev){
-      $codeReg = desencriptar($codeRegInRev);
-      $tables = array('codigos_registro','colectores');
-      $verifCodeReg = colectorM::verificarStatusCodRegM($tables, $codeReg);
-      $length = count($verifCodeReg);
-      if($length == 0){
-        $respuesta = "El colector está mal configurado, habla con tu departamente ténico.";
-      }else{
-        if($verifCodeReg[0]['status'] == 1){
-          $respuesta = $verifCodeReg;
-        }
-      }
-      $jsonString = json_encode($respuesta);
-      echo $jsonString;
-    }
-}
+  }
 
  ?>

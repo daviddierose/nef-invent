@@ -5,7 +5,7 @@ class alerts{
     this.delayTime = delayTime;
   }
   showAlerts(){
-    $(`#Alert`).html(this.text);
+    $(`#Alert-text`).html(this.text);
     $('#Alert').addClass(this.color);
     $('#row-alert').fadeIn(200);
     setTimeout(()=>{
@@ -17,7 +17,7 @@ class alerts{
   showAlertsCountdown() {
     let newText = this.text + `<br>Si intentara de nuevo en: <br><span
                                 id="spanAlert">10</span>`;
-    $(`#Alert`).html(newText);
+    $(`#Alert-text`).html(newText);
     $('#Alert').addClass(this.color);
     $('#row-alert').fadeIn(200);
     let time = 10;
@@ -68,26 +68,44 @@ class style{
 }
 
 class configColectorC{
-  static getColector(type){
-      let colectConfigFun;
-      if(localStorage.getItem(type)){
-        colectConfigFun = JSON.parse(localStorage.getItem(type));
-      }else{
-        colectConfigFun = ["", "Colector"];
-      }
-        return colectConfigFun;
-  }
 
-  static saveColectorId(codeReg){
+static getConfig(){
+    let colectConfigFun;
+    if(localStorage.getItem('config')){
+      colectConfigFun = JSON.parse(localStorage.getItem('config'));
+    }else{
+      let colectConfigCreate = [{'colect':{
+                            'codeReg':'',
+                            'codeDevice':'',
+                            'colectName':'',
+                            'colectStatus':0,
+                            'input': 0},
+                          'inventory':{
+                            'inventStatus':0,
+                            'inventBranchOffice':'',
+                            'inventId': 0}}];
+      localStorage.setItem("config", JSON.stringify(colectConfigCreate));
+    }
+      return colectConfigFun;
+ }
+
+  static saveCodeReg(codeReg){
+      let car = "abcdefghijkmnpqrtuvwxyzABCDEFGHJKMNPQRTUVWXYZ2346789";
+      let codeDevice = "";
+      for (let i=0; i<16; i++) codeDevice +=car.charAt(Math.floor(Math.random()*car.length));
+      let info = {
+        codeReg: codeReg,
+        codeDevice: codeDevice,
+      };
       alerts.showLoadingScreen();
       const saveColIdPromise = new Promise((resolve, reject)=>{
-        $.post("connection/connection.php", {codeReg}, function(response){})
+        $.post("connection/connection.php", info, function(response){})
         .done(function(response){
           let res = JSON.parse(response);
-          if(res[0] == true || res[0]== "true"){
+          if(res[0] == true || res[0] == "true"){
             resolve(res)
           }else{
-            reject(response);
+            reject(res);
           }
         })
         .fail(function(){
@@ -96,19 +114,19 @@ class configColectorC{
       });
 
       saveColIdPromise.then(res =>{
-        console.log(res[1]);
         alerts.hideLoadingScreen();
-        let colectIdSave = [];
-        colectIdSave.push(res[1]);
-        colectIdSave.push(res[2]);
-        localStorage.setItem("aBc", JSON.stringify(colectIdSave));
-        const alertSaveConfi = new alerts("alert-success", `La configuración ha
-                                sido guardada con exito.`, 3000);
+        let config = configColectorC.getConfig();
+        config[0]['colect']['codeReg'] = res[1];
+        config[0]['colect']['colectName'] = res[2];
+        config[0]['colect']['codeDevice'] = res[3];
+        localStorage.setItem("config", JSON.stringify(config))
+        const alertSaveConfi = new alerts("alert-success", `Configuración
+                                    guardada con éxito.`, 3000);
         alertSaveConfi.showAlerts();
         configColectorC.showColector();
 
       }).catch(err =>{
-        err = JSON.parse(err);
+        console.log(err);
         alerts.hideLoadingScreen();
         const alertErrorStatusVal = new alerts("alert-danger", err, 3000);
         alertErrorStatusVal.showAlerts();
@@ -116,10 +134,9 @@ class configColectorC{
   }
 
   static showColector(){
-      let config;
-      let colectConfig = configColectorC.getColector("aBc");
-      $("#colect-name").val(colectConfig[1]);
-      $("#colect-code").val(colectConfig[0]);
+      let config = configColectorC.getConfig();
+      $("#colect-name").val(config[0]['colect']['colectName']);
+      $("#colect-code").val(config[0]['colect']['codeReg']);
     }
 
   }

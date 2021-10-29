@@ -1,6 +1,3 @@
-//var codeKeyComplete = [];
-//var codes = [];
-var numberColectorInfo;
 const music = new Audio('../inventario/vistas/sound/alarm.mp3');
 var alarmaCodeWrong;
 var md;
@@ -8,17 +5,14 @@ let info, date, ok, bad;
 
 
  $(document).ready(function () {
-    configColectorC.reviewId();
-    configColectorC.reviewInventStatus();
-    configColectorC.reviewColectIdStatus();
     const pDocumentReady = new Promise((resolve, reject)=>{
-        configColectorC.numberColector();
-        resolve();
+      configColectorC.reviewStatus();
+      resolve();
     });
     pDocumentReady.then(res =>{
       let codes;
       ajustarTamaño();
-      configColectorC.showColector();
+      configColectorC.showConfig();
 
       if(!!document.getElementById("select-correlative-No")){
         let colectorRequest = configColectorC.getColectorConfig();
@@ -98,8 +92,7 @@ let info, date, ok, bad;
 
         $("#select-config-In, #select-config-label").change(function(){
           let configIn = $('#select-config-In').val();
-          let label = $('#select-config-label').val();
-              configColectorC.saveColectorConfig(configIn, label);
+              configColectorC.saveInputConfig(configIn);
           });
 
         $(document).on('click', '#alert-boton', function(){

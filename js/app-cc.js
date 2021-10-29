@@ -13,6 +13,6 @@ $(document).ready(function(){
     $(document).on("click", "#btn-save-id", function(event){
       event.preventDefault();
       let codeReg = $("#colect-code").val();
-      configColectorC.saveColectorId(codeReg);
+      configColectorC.saveCodeReg(codeReg);
     });
 })
