@@ -1,6 +1,10 @@
 <div class="vertical-nav active" id="sidebar">
-  <div class="text-gray d-flex row px-3 py-0">
-    <div class="ml-1 mt-1 px-1" id="colectId">
+  <div class="text-gray row px-3 py-0">
+    <div class="col-sm-12 ml-1 mt-1 px-1" id="colectId">
+    </div>
+    <div class="col-sm-12 ml-1 mt-1 px-1" id="inventId">
+    </div>
+    <div class="col-sm-12 ml-1 mt-1 px-1" id="sucursal">
     </div>
   </div>
   <div class="py-4 px-3 mb-0">

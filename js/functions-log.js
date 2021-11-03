@@ -1,3 +1,64 @@
+class alerts{
+  constructor(color, text, delayTime){
+    this.color = color;
+    this.text = text;
+    this.delayTime = delayTime;
+  }
+  showAlerts(){
+    $(`#Alert-text`).html(this.text);
+    $('#Alert').addClass(this.color);
+    $('#row-alert').fadeIn(200);
+    setTimeout(()=>{
+      $(`#row-alert`).fadeOut(200);
+      $('#Alert').removeClass(this.color);
+    }, parseInt(this.delayTime));
+}
+
+  showAlertsCountdown() {
+    let newText = this.text + `<br>Si intentara de nuevo en: <br><span
+                                id="spanAlert">10</span>`;
+    $(`#Alert-text`).html(newText);
+    $('#Alert').addClass(this.color);
+    $('#row-alert').fadeIn(200);
+    let time = 10;
+    setInterval(()=>{
+      if (time > 0){
+        time --;
+        $(`#spanAlert`).html(time);
+      }else{
+          clearInterval();
+      }}, 1000);
+      setTimeout(()=>{
+        $(`#row-alert`).fadeOut(200);
+        $('#Alert').removeClass(this.color);
+      },this.delayTime);
+  }
+
+  showAlertsBotton(){
+    $(`#Alert-text`).html(this.text);
+    $('#Alert').addClass(this.color);
+    $('#alert-boton').toggleClass('d-none');
+    $('#code_product').blur();
+    $('#row-alert').fadeIn(200);
+    music.play();
+    music.loop =true;
+    alarmaCodeWrong = setInterval(()=>{
+      $('#Alert').toggleClass('alert-danger');
+      $('#Alert').toggleClass('alert-primary');
+      var sta = $('#row-alert').css('display');
+      console.log("1");
+    }, 100);
+}
+
+  static showLoadingScreen(){
+    $('#loading-screen').show();
+  }
+
+  static hideLoadingScreen(){
+    $('#loading-screen').hide();
+  }
+}
+
 class style{
   static ajustarTamaño() {
     md = new MobileDetect(window.navigator.userAgent);
@@ -26,5 +87,41 @@ class style{
       let heightF = heightR - heightD;
       $("#form-row-ajust").css("height", heightF);
     }
+  }
+}
+
+class login{
+  constructor(user, pass){
+    this.user = user;
+    this.pass = pass;
+  }
+
+  sendLogin(){
+    let info = {
+      user: this.user,
+      pass: this.pass,
+      reqAct: 'login',
+    }
+    console.log(this.pass);
+    const loginProm = new Promise((resolve, reject)=>{
+      $.post("connection/connection.php", info, function(response){})
+      .done(function(response){
+        console.log(response);
+        let res = JSON.parse(response);
+        if(res['reqStatus'] == false){
+          reject(res);
+        }
+        else if(res['reqStatus'] == true){
+          resolve(res);
+        }
+      }).fail(function(){
+          reject();
+        });
+    }).then(res=>{
+          location.replace(res['route']);
+    }).catch(err=>{
+        const alert = new alerts('alert-danger', err['message'], err['messDelayTime']);
+        alert.showAlerts();
+    });
   }
 }

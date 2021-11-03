@@ -7,6 +7,8 @@
 			$rutas = new rutasControlador();
 			$rutas -> appC();
 		?>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/core.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/estilos.css">
 		<link rel="stylesheet" type="text/css" href="css/bootstrap.css" media="screen">
 		<link rel="stylesheet" type="text/css" href="css/bootstrap-switch.min.css">

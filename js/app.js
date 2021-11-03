@@ -2,6 +2,8 @@ const music = new Audio('../inventario/vistas/sound/alarm.mp3');
 var alarmaCodeWrong;
 var md;
 let info, date, ok, bad;
+var amount;
+var amountRev;
 
 
  $(document).ready(function () {
@@ -15,8 +17,6 @@ let info, date, ok, bad;
       configColectorC.showConfig();
 
       if(!!document.getElementById("select-correlative-No")){
-        let colectorRequest = configColectorC.getColectorConfig();
-        correlativeList(colectorRequest[0]);
         codes = [];
       }else{
         codes = codesC.getCodes();
@@ -25,7 +25,7 @@ let info, date, ok, bad;
         table(codes, "reverse");
 
     }).catch(err =>{
-      console.log("no");
+
     });
 
     $("form").keypress(function(key) {
@@ -51,7 +51,6 @@ let info, date, ok, bad;
       $(document).on("click", "#saveCodes", function(event){
         event.preventDefault();
         codesC.saveCodesList();
-        $('.navbar-toggler').trigger('click');
       });
 
       $(document).on("click", "#deleteCodes", function(event){
@@ -60,25 +59,15 @@ let info, date, ok, bad;
           $('.navbar-toggler').trigger('click');
       });
 
-      /*$("#code_correlative").keyup(function () {
-            let corLenght = $("#code_correlative").val().length;
-            if(corLenght > 0){
-              window.setTimeout(function(){
-                let cor = $("#code_correlative").val();
-                callList(cor);
-              }, 1000);
-            }
-      });*/
-
       $("#select-correlative-No").change(function(){
         let cor = $(this).val();
-          callList(cor);
+          reviewCodeList.callCodeList(cor);
         });
 
-      $(document).on("click", "#deleteCodesRev", function(){
+      $(document).on("click", "#deleteListCodes", function(){
         event.preventDefault();
         let cor = $("#select-correlative-No").val();
-        codesC.deleteCodesRev(cor);
+        reviewCodeList.deleteCodesRev(cor);
         $('.navbar-toggler').trigger('click');
       });
 
@@ -90,10 +79,10 @@ let info, date, ok, bad;
           }
         });
 
-        $("#select-config-In, #select-config-label").change(function(){
+        $("#select-config-In").change(function(){
           let configIn = $('#select-config-In').val();
               configColectorC.saveInputConfig(configIn);
-          });
+        });
 
         $(document).on('click', '#alert-boton', function(){
           music.pause();
@@ -102,4 +91,5 @@ let info, date, ok, bad;
           $('#code_product').focus();
           clearInterval(alarmaCodeWrong);
         });
+
 });

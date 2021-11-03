@@ -1,20 +1,20 @@
 <?php
-
 class AdminC{
 
-  public function IngresoC(){
-    if(isset($_POST["usuarioI"])){
-      $datosC = array("usuario"=>$_POST["usuarioI"], "clave"=>$_POST["claveI"]);
+  public function IngresoC($user, $pass, $response){
+      $datosC = array("usuario"=>$user, "clave"=>$pass);
       $tableBD = "usuarios";
       $respuesta = AdminM::IngresoM($datosC, $tableBD);
-      if ($respuesta["usuario"] == $_POST["usuarioI"] && $respuesta["clave"] == $_POST["claveI"]){
+      if ($respuesta["usuario"] == $user && $respuesta["clave"] == $pass){
             session_start();
                 $_SESSION["Ingreso"] = true;
-                header("location:index.php?ruta=config-colect");
+                $response->reqStatus = true;
+                $response->route = '?ruta=config-colect';
       }else{
-        echo "ERROR AL INGRESAR";
+        $response->reqStatus = false;
+        $response->message = 'Usuario o Contraseña incorrecto.';
+        $response->messDelayTime = 2000;
       }
-    }
   }
 
   public function readColectoresC(){

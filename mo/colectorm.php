@@ -1,14 +1,8 @@
 <?php
   require_once "conexionbd.php";
-  require_once "mcript.php";
+  require_once "../co/encryptc.php";
 
   class colectorM{
-    static public function readColectorsLenghtM($table){
-      $pdo = new ConexionBD();
-      $pst = $pdo->bd->query("SELECT count(1) FROM $table");
-      return $pst -> fetchColumn();
-      unset($pdo);
-    }
 
     static public function changeColectorStatusM($colector, $status){
       $pdo = new ConexionBD();
@@ -34,32 +28,28 @@
       return $response;
     }
 
-    static public function registerColectorM($tables, $codeReg, $verif, $codeDevice){
+    static public function registerColectorM($tables, $info){
       $pdo = new ConexionBD();
       try{
         $pdo ->bd->beginTransaction();
-            $id = $verif[0]['id'] - 100;
+            $id = $info['id'] - 100;
             $pst = $pdo->bd->prepare("UPDATE $tables[1] SET codigo_registro=:codigo_registro WHERE id=:id");
             $pst->bindParam(':id',$id, PDO::PARAM_INT);
-            $pst->bindParam(':codigo_registro',$verif[0]['id'], PDO::PARAM_STR);
+            $pst->bindParam(':codigo_registro',$info['id'], PDO::PARAM_STR);
             $pst->execute();
 
             $pst = $pdo->bd->prepare("UPDATE $tables[0] SET status='1', code_device=:codeDevice WHERE id=:id");
-            $pst->bindParam(':id', $verif[0]['id'], PDO::PARAM_INT);
-            $pst->bindParam(':codeDevice', $codeDevice, PDO::PARAM_STR);
+            $pst->bindParam(':id', $info['id'], PDO::PARAM_INT);
+            $pst->bindParam(':codeDevice', $info['codeDevice'], PDO::PARAM_STR);
             $pst->execute();
 
             $pdo->bd->commit();
 
-            $nombre = "colector $id";
-            $encCodeReg = encriptar($codeReg);
-            $encCodeDevice = encriptar($codeDevice);
-
-            $response = array(true, $encCodeReg, $nombre, $encCodeDevice);
+            $response = true;
         }
         catch(PDOException $ex){
           $pdo->bd->rollback();
-          $response = $ex;
+          $response = false;
       }
       unset($pdo);
       return $response;
@@ -70,9 +60,14 @@
       $pst = $pdo->bd->prepare("SELECT * FROM $table WHERE codigo=:codigo");
       $pst->bindParam(':codigo',$codeReg, PDO::PARAM_STR);
       $pst->execute();
-      $verif = $pst->fetchAll();
+      $verif = $pst->fetch();
+      if($verif != null){
+        $response = $verif;
+      }else{
+        $response = null;
+      }
       unset($pdo);
-      return ($verif);
+      return ($response);
     }
 
     static public function reviewStatusColectIdM($table, $codeReg){
@@ -80,39 +75,14 @@
       $pst = $pdo->bd->prepare("SELECT status FROM $table WHERE codigo_registro=:codigo");
       $pst->bindParam(':codigo',$codeReg, PDO::PARAM_STR);
       $pst->execute();
-      $verif = $pst->fetchAll();
-      unset($pdo);
-      return $verif;
-    }
-
-    static public function reviewStatusInventM(){
-      $pdo = new ConexionBD();
-      $pst = $pdo->bd->query("SELECT MAX(id) AS id FROM inventarios WHERE status='1'");
-      $pst->execute();
-      $id = $pst->fetch();
-      if($id['id'] != null && $id > 0 ){
-        $pst = $pdo->bd->prepare("SELECT * FROM inventarios WHERE id=:id");
-        $pst->bindParam(':id', $id['id'], PDO::PARAM_INT);
-        $pst->execute();
-        $invent = $pst->fetch();
-
-        $pst = $pdo->bd->prepare("SELECT nombre FROM sucursales WHERE id=:id");
-        $pst->bindParam(':id', $invent['sucursal'], PDO::PARAM_INT);
-        $pst->execute();
-        $sucursal = $pst->fetch();
-
-        $res = array('id'=> $id['id'],
-                     'status'=> $invent['status'],
-                     'sucursal'=> $sucursal['nombre']
-                   );
+      $verif = $pst->fetch();
+      if($verif != null){
+        $response = $verif;
       }else{
-        $res = array('id'=> 0,
-                     'status'=> 0,
-                     'sucursal'=> '',
-                    );
+        $response = null;
       }
       unset($pdo);
-      return $res;
+      return ($response);
     }
   }
  ?>

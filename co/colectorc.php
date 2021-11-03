@@ -1,15 +1,10 @@
 <?php
+  require_once "responsec.php";
+  require_once "encryptc.php";
   require_once "../mo/colectorm.php";
-  require_once "../mo/mcript.php";
+  require_once "../mo/inventorym.php";
 
   class colectorC{
-    public function readColectorsLenghtC(){
-      $table = "colectores";
-      $response = colectorM::readColectorsLenghtM($table);
-      $jsonString = json_encode(intval($response));
-      echo $jsonString;
-    }
-
     public function changeColectorStatusC($colector, $status){
       if($status == 0 || $status == 1){
         $table = "colectores";
@@ -31,67 +26,102 @@
       }
     }
 
-    public function registerColectorC($codeReg, $codeDevice){
+    public function registerColectorC($codesRD, $response){
+      $codeReg = $codesRD->getCodeRegIn();
+      $codeDevice = $codesRD->getCodeDeviceIn();
       $table = 'codigos_registro';
       $verif = colectorM::verificarStatusCodRegM($table, $codeReg);
-      $length = count($verif);
-      if($length == 0){
-        $respuesta = array("El código de registro no es valido.");
+      if($verif==null){
+        $response->message = "El código de registro no es valido.";
+        $response->messDelayTime = 2000;
       }else{
-        if($verif[0]['status'] == 1){
-          $respuesta = array("El código de registro ya está en uso.");
+        if($verif['status'] == 1){
+          $response->message = "El código de registro ya está en uso.";
+          $response->messDelayTime = 2000;
         }else{
           $tables = array('codigos_registro', 'colectores');
-          $respuesta = colectorM::registerColectorM($tables, $codeReg, $verif, $codeDevice);
-        }
-      }
-
-      $jsonString = json_encode($respuesta);
-      echo $jsonString;
-    }
-
-    public function verificarStatusCodRegC($codeRegIn, $codeDeviceIn){
-      $respuesta = array(true);
-      $codeReg = desencriptar($codeRegIn);
-      $codeDevice = desencriptar($codeDeviceIn);
-      $table = 'codigos_registro';
-      $verif = colectorM::verificarStatusCodRegM($table, $codeReg);
-      $length = count($verif);
-      if($length == 0){
-        $respuesta = array('resCodeReg'=> false,
-                           'resCol'=> 0,
-                           'resInv'=> 0,
-                           'resInvId'=>0,
-                           'resInvBranch'=> '',
-                           'message'=>'El colector está mal configurado,
-                                      habla con tu departamente ténico.',
-                            );
-      }else{
-        if($verif[0]['status'] == 1 && $verif[0]['code_device'] == $codeDevice){
-          $colectStatus = colectorM::reviewStatusColectIdM('colectores', $verif[0]['id']);
-          $inventStatus = colectorM::reviewStatusInventM();
-          if($colectStatus[0]['status'] == 0 || $inventStatus['status'] == 0){
-              $respuesta = array('resCodeReg'=> true,
-                                 'resCol'=> $colectStatus[0]['status'],
-                                 'resInv'=> $inventStatus['status'],
-                                 'resInvId'=> $inventStatus['id'],
-                                 'resInvBranch'=> $inventStatus['sucursal'],
-                                 'message'=>'No puedes ingresar códigos. Es posible que no exista un
-                                            inventario activo o el colector está deshabilitado.',
-                                  );
-          }else if(($colectStatus[0]['status'] == 1 && $inventStatus['status'] == 1)){
-            $respuesta = array('resCodeReg'=> true,
-                               'resCol'=> $colectStatus[0]['status'],
-                               'resInv'=> $inventStatus['status'],
-                               'resInvId'=> $inventStatus['id'],
-                               'resInvBranch'=> $inventStatus['sucursal'],
-                               'message'=>'',
-                              );
+          $info = array('codeReg'=>$codeReg,
+                        'codeDevice'=>$codeDevice,
+                        'id'=>$verif['id'],
+                      );
+          $respuesta = colectorM::registerColectorM($tables, $info);
+          if($respuesta == true){
+              $response->message = "Registro completado.";
+              $response->messDelayTime = 2000;
+              $response->codeReg = true;
+              $response->codeRegDev = $codesRD->getCodeReg();
+              $response->codeDevice = true;
+              $response->codeDeviceDev = $codesRD->getCodeDevice();
+              $response->colId = $verif['id']-100;
+              $response->reqStatus = true;
+          }
+          else if($respuesta == false){
+              $response->message = "No se pudo realizar el registro.";
+              $response->messDelayTime = 2000;
           }
         }
       }
-        $jsonString = json_encode($respuesta);
-        echo $jsonString;
+    }
+
+    public function verificarStatusCodRegC($codesRD, $response){
+      $codeReg = $codesRD->getCodeReg();
+      $codeDevice = $codesRD->getCodeDevice();
+      if($codeReg == null || $codeDevice == null){
+        $response -> message = 'El colector está mal configurado,
+                               habla con tu departamente ténico.';
+        $response -> messDelayTime = 400;
+      }else{
+          $table = 'codigos_registro';
+          $verCodRegStatus = colectorM::verificarStatusCodRegM($table, $codeReg);
+          if($verCodRegStatus == null){
+            $response -> message = 'El colector está mal configurado,
+                                   habla con tu departamente ténico.';
+            $response -> messDelayTime = 400;
+          }else{
+            if($verCodRegStatus['status'] == 1 && $verCodRegStatus['code_device'] == $codeDevice){
+              $colectStatus = colectorM::reviewStatusColectIdM('colectores', $verCodRegStatus['id']);
+              $inventStatus = inventoryM::reviewStatusInventM();
+              $response->codeReg = true;
+              $response->codeDevice = true;
+              $response->colStatus = $colectStatus['status'];
+              $response->invStatus = $inventStatus['status'];
+              $response->invId = $inventStatus['id'];
+              $response->invBranch = $inventStatus['sucursal'];
+              $id = $verCodRegStatus['id'] - 100;
+              $response ->colId = $id;
+
+              if($colectStatus['status'] == 0 || $inventStatus['status'] == 0){
+
+                $colect = (string)$colectStatus['status'];
+                $inventory = (string)$inventStatus['status'];
+
+                $response->messDelayTime = 5000;
+
+                $case = "$colect $inventory";
+                switch ($case){
+                  case "0 0":
+                     $response->message = 'El colector '.$id.' Está
+                               deshabilitado y no existe un inventario activo.';
+                  break;
+                  case "0 1":
+                     $response->message = 'El colector '.$id.' Está deshabilitado.';
+                  break;
+                  case "1 0":
+                     $response->message = 'No existe un inventario activo.';
+                  break;
+                }
+
+              }else if(($colectStatus['status'] == 1 && $inventStatus['status'] == 1)){
+                $response->reqStatus = true;
+                $response->message = 'Actualmente se está trabajado
+                                      <br><span class="font-weight-bold">Inventario:</span> '.$inventStatus['id'].'
+                                      <br><span class="font-weight-bold">Tienda:</span> '.$inventStatus['sucursal'].'
+                                      <br>Usted está trabajando con el <span class="font-weight-bold">colector:</span> '.$id;
+                $response->messDelayTime = 8000;
+              }
+            }
+          }
+      }
     }
   }
 

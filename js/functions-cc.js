@@ -96,47 +96,48 @@ static getConfig(){
       let info = {
         codeReg: codeReg,
         codeDevice: codeDevice,
+        reqAct: 'saveCodeReg',
       };
+      console.log(info);
       alerts.showLoadingScreen();
       const saveColIdPromise = new Promise((resolve, reject)=>{
         $.post("connection/connection.php", info, function(response){})
         .done(function(response){
+          console.log(response);
           let res = JSON.parse(response);
-          if(res[0] == true || res[0] == "true"){
+          if(res['reqStatus'] == true){
             resolve(res)
-          }else{
+          }else if(res['reqStatus'] == false){
             reject(res);
           }
         })
         .fail(function(){
           reject(err);
         });
-      });
-
-      saveColIdPromise.then(res =>{
+      }).then(res =>{
         alerts.hideLoadingScreen();
         let config = configColectorC.getConfig();
-        config[0]['colect']['codeReg'] = res[1];
-        config[0]['colect']['colectName'] = res[2];
-        config[0]['colect']['codeDevice'] = res[3];
+        config['colect']['codeReg'] = res['codeRegDev'];
+        config['colect']['colectName'] = `colector ${res['colId']}`;
+        config['colect']['codeDevice'] = res['codeDeviceDev'];
         localStorage.setItem("config", JSON.stringify(config))
-        const alertSaveConfi = new alerts("alert-success", `Configuración
-                                    guardada con éxito.`, 3000);
+        const alertSaveConfi = new alerts("alert-success", res['message'], res['messDelayTime']);
         alertSaveConfi.showAlerts();
         configColectorC.showColector();
 
       }).catch(err =>{
-        console.log(err);
         alerts.hideLoadingScreen();
-        const alertErrorStatusVal = new alerts("alert-danger", err, 3000);
+        const alertErrorStatusVal = new alerts("alert-danger", err['message'], err['messDelayTime']);
         alertErrorStatusVal.showAlerts();
       });
   }
 
   static showColector(){
       let config = configColectorC.getConfig();
-      $("#colect-name").val(config[0]['colect']['colectName']);
-      $("#colect-code").val(config[0]['colect']['codeReg']);
+      $("#colect-name").val(config['colect']['colectName']);
+      $("#colect-code").val(config['colect']['codeReg']);
     }
+
+
 
   }

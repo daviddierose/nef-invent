@@ -72,98 +72,96 @@ class configColectorC{
       if(localStorage.getItem('config')){
         colectConfigFun = JSON.parse(localStorage.getItem('config'));
       }else{
-        let colectConfigCreate = [{'colect':{
-                              'codeReg':'',
-                              'codeDevice':'',
-                              'colectName':'',
-                              'colectStatus':0,
-                              'input': 0},
-                            'inventory':{
-                              'inventStatus':0,
-                              'inventBranchOffice':'',
-                              'inventId': 0}}];
+        let colectConfigCreate = {'colect':{
+                                    'codeReg':'',
+                                    'codeDevice':'',
+                                    'colectName':'',
+                                    'colectStatus':0,
+                                    'input': 0},
+                                  'inventory':{
+                                    'inventStatus':0,
+                                    'inventBranchOffice':'',
+                                    'inventId': 0}
+                                  };
         localStorage.setItem("config", JSON.stringify(colectConfigCreate));
       }
         return colectConfigFun;
    }
 
   static saveInputConfig(conIn){
+    let codes = codesC.getCodes();
     let config = configColectorC.getConfig();
-    config[0]['colect']['input'] = conIn;
-    localStorage.setItem("config", JSON.stringify(config));
+    if(codes.length == 0 ){
+      config['colect']['input'] = conIn;
+      localStorage.setItem("config", JSON.stringify(config));
+    }else{
+      const alert = new alerts('alert-danger', `tienes un listado iniciado.
+                                Debes Guardar antes de cambiar la configuración.`, 3000);
+      alert.showAlerts();
+    }
+      configColectorC.showConfig();
   }
 
   static showConfig(){
-      let config = configColectorC.getConfig("config");
-      $("#select-config-In").val(config[0]['colect']['input']);
-
-      $("#colectId").html(`<p>ID: <span class="text-capitalize">${config[0]['colect']['colectName']}</span></p>`);
+      let config = configColectorC.getConfig();
+      $("#select-config-In").val(config['colect']['input']);
+      $("#colectId").html(`<p>ID: <span class="ml-2 text-capitalize">
+                          ${config['colect']['colectName']}</span></p>`);
+      $("#inventId").html(`<p>Inventario: <span class="ml-2 text-capitalize">
+                          ${config['inventory']['inventId']}</span></p>`);
+      $("#sucursal").html(`<p>Tienda: <span class=" ml-2 text-capitalize">
+                          ${config['inventory']['inventBranchOffice']}</span></p>`);
     }
 
   static reviewStatus(){
     alerts.showLoadingScreen();
     let config = configColectorC.getConfig();
-    if(config[0]["colect"]["codeReg"].length == 44
-    && config[0]["colect"]["codeDevice"].length == 44){
-      let codeReg = config[0]["colect"]["codeReg"];
-      let codeDevice = config[0]["colect"]["codeDevice"];
+    if(config["colect"]["codeReg"].length == 44
+    && config["colect"]["codeDevice"].length == 44){
+      let codeReg = config["colect"]["codeReg"];
+      let codeDevice = config["colect"]["codeDevice"];
       let info = {
-        codeRegIn: codeReg,
-        codeDeviceIn: codeDevice,
+        codeReg: codeReg,
+        codeDevice: codeDevice,
+        reqAct: 'checkStatus',
       }
       const reviewIdPromise = new Promise((resolve, reject)=>{
         $.post("connection/connection.php", info, function(response){})
         .done(function(response){
           console.log(response);
           let res = JSON.parse(response);
-
-          config[0]['colect']['colectStatus'] = res['resCol'];
-          config[0]['inventory']['inventId'] = res['resInvId'];
-          config[0]['inventory']['inventStatus'] = res['resInv'];
-          config[0]['inventory']['inventBranchOffice'] = res['resInvBranch'];
-          localStorage.setItem("config", JSON.stringify(config));
-
-          if(res['resCodeReg'] == false
-          || res['resCol'] == 0
-          || res['resInv'] == 0){
+          checkResponse(res, config, "");
+          if(res['reqStatus'] == false){
             reject(res);
           }
-          else if(res['resCodeReg'] == true
-          && res['resCol'] == 1
-          && res['resInv'] == 1){
+          else if(res['reqStatus'] == true){
             resolve(res);
           }
-          else{
-            reject(res);
-          }
-        }).fail(function(response){
+        }).fail(function(){
             reject();
         });
       });
 
       reviewIdPromise.then(res =>{
-        alerts.hideLoadingScreen();
-        $('#code_product').removeAttr('readonly').focus();
+        const alertPromise = new Promise((resolve, reject)=>{
+          const alertReqStatus = new alerts('alert-success', res['message'], res['messDelayTime']);
+          alertReqStatus.showAlerts();
+          resolve();
+        }).then(res=>{
+          if(!!document.getElementById("select-correlative-No")){
+            reviewCodeList.correlativeList();
+          }
+          alerts.hideLoadingScreen();
+        });
       }).catch(err =>{
-        console.log(err);
+        const alertReqStatus = new alerts('alert-danger', err['message'], err['messDelayTime']);
+        alertReqStatus.showAlerts();
         alerts.hideLoadingScreen();
-        if(err['resInv'] == 0){
-          let codes = [];
-          localStorage.setItem("codesList", JSON.stringify(codes));
-        }
-        const alertReviewID = new alerts('alert-danger', err['message'], 5000);
-        alertReviewID.showAlerts();
-
-        if(err['resCodeReg']== false){
-          setTimeout(()=>{
-            location.replace('?ruta=login');
-          },5000);
-        }
       });
     }else{
-      const alertReviewIDNo = new alerts('alert-danger', `Colector no configurado,
+      const alertPreReq = new alerts('alert-danger', `Colector no configurado,
                                   Comunicate con el administrador.`, 5000);
-      alertReviewIDNo.showAlerts();
+      alertPreRe.showAlerts();
       setTimeout(()=>{
         location.replace('?ruta=login');
       },5000);
@@ -182,7 +180,7 @@ class codesC{
     let codeI = [];
     let amount;
     let config = configColectorC.getConfig('config');
-    let input = parseInt(config[0]['colect']['input']);
+    let input = parseInt(config['colect']['input']);
     if(this.code.length == 0){
       const alertEmptyCode = new alerts("alert-danger", `No puedes
                             guardar un código vacio.`, 3000);
@@ -198,7 +196,6 @@ class codesC{
           return;
           break;
           case 1:
-            console.log('caso1')
             let reviewCode1 = codesC.reviewStructureCode(this.code, input);
             if(reviewCode1 == true){
               amount = parseInt(1);
@@ -209,15 +206,19 @@ class codesC{
           break;
           case 2:
             let reviewCode2 = codesC.reviewStructureCode(this.code, input);
-            if(reviewCode2 == true){
-              amount = parseInt(prompt("Ingrese la cantidad de pares", "0"));
+            let num = codesC.getAmount();
+            if(reviewCode2 == true && num >0 && num <101){
+              amount = num;
             }else{
               $("#code_product").val("");
               return;
             }
           break;
         }
-        codeI.push(this.code, amount, 'text-dark');
+        codeI = {'code': this.code,
+                 'amount': amount,
+                 'color': 'text-dark',
+                };
         codes.push(codeI);
         localStorage.setItem("codesList", JSON.stringify(codes));
         codes = codesC.getCodes();
@@ -239,11 +240,8 @@ class codesC{
         const regCode3 = new RegExp(/[0-9]{11}-{1}[0-9]{1}[A-Za-z]{1}[0-9]{3}[A-za-z]+\s+/);
         let length = code.length;
         if(length == 21 && regCode1.test(code)){
-            console.log(length);
-            console.log('1');
             return true;
         }else if(length == 21 && regCode2.test(code)){
-            console.log('2');
             return true;
         }else if(length == 21 && regCode3.test(code)){
             return true;
@@ -267,26 +265,28 @@ class codesC{
         }
         break;
     }
-    const regCode1 = new RegExp(/[0-9]{11}-{1}[0-9]{1}[A-Za-z]{1}[0-9]{5}\s{2}/);
-    const regCode2 = new RegExp(/[0-9]{11}-{1}[0-9]{1}[A-Za-z]{1}[0-9]{5}[.]{1}5{1}/);
-    const regCode3 = new RegExp(/[0-9]{11}-{1}[0-9]{1}[A-Za-z]{1}[0-9]{3}[A-za-z]+\s+/);
-    let length = code.length;
-    if(length == 21 && regCode1.test(code)){
-        console.log(length);
-        console.log('1');
-        return true;
-    }else if(length == 21 && regCode2.test(code)){
-        console.log('2');
-        return true;
-    }else if(length == 21 && regCode3.test(code)){
-        return true;
+  }
+
+  static getAmount(){
+    const amountReg = new RegExp(/[0-9]/);
+    let amount = prompt("ingrese la cantidad de pares","0");
+    if(amountReg.test(amount)){
+        if(amount == 0){
+          const alert = new alerts("alert-danger", `La cantidad no puede ser 0.`, 2000);
+          alert.showAlerts();
+          return amount;
+        }else if(amount > 100){
+          const alert = new alerts("alert-danger", `No puedes ingresar más de 100 pares a la vez.`, 2000);
+          alert.showAlerts();
+          return amount;
+        }else{
+          return amount;
+        }
+    }else{
+      const alert = new alerts("alert-danger", `El dato ingresado no es un número`, 2000);
+      alert.showAlerts();
+      return amount;
     }
-    else{
-        const alertErrorStCode = new alerts("alert-danger", `El código no comple
-                                    con los parametros necesarios`, 0);
-        alertErrorStCode.showAlertsBotton();
-        return false;
-      }
   }
 
   static getCodes(){
@@ -294,7 +294,7 @@ class codesC{
     if(localStorage.getItem("codesList")){
       codesListRec = JSON.parse(localStorage.getItem("codesList"));
     }else{
-      codesListRec = [0];
+      codesListRec = [];
       localStorage.setItem("codesList", JSON.stringify(codesListRec));
     }
       return codesListRec;
@@ -303,21 +303,22 @@ class codesC{
   static deleteCodeList(){
     let codes = [];
     localStorage.setItem("codesList", JSON.stringify(codes));
-    const alertDeleteList = new alerts("alert-success", `Se ha eliminado
-                            el listado con éxito.`, 3000);
-    alertDeleteList.showAlerts();
     table(codes, "reverse");
   }
+
   static deleteCodeListAsk(){
     let codesRev = codesC.getCodes();
     if(codesRev.length > 0){
       let option = confirm(`¿Estás seguro de eliminar el listadod de códigos?`);
       if(option == true){
           codesC.deleteCodeList();
+          const alertDeleteList = new alerts("alert-success", `Se ha eliminado
+                                  el listado con éxito.`, 2000);
+          alertDeleteList.showAlerts();
         }
     }else {
       const alertDeleteEmptyList = new alerts("alert-danger", `No pudes
-                                    eliminar un listado vacio.`, 3000);
+                                    eliminar un listado vacio.`, 2000);
       alertDeleteEmptyList.showAlerts();
     }
   }
@@ -325,15 +326,15 @@ class codesC{
   deleteCode(){
     let codes = codesC.getCodes();
     let indice = this.code - 1;
-    let code = codes[indice][0];
-    let amount = codes[indice][1];
+    let code = codes[indice]['code'];
+    let amount = codes[indice]['amount'];
     let option = confirm(`¿Estás seguro de eliminar el código ${code} con ${amount} pares ?`);
     if (option == true){
       codes.splice(indice,1)
       const alarmCodeDelete = new alerts('alert-danger', `
                               correlativo eliminado: ${this.code}<br>
                               Código eliminado: ${code}<br>
-                              Cantidad de Pares: ${amount}<br>`, 5000);
+                              Cantidad de Pares: ${amount}<br>`, 2000);
       alarmCodeDelete.showAlerts();
       localStorage.setItem("codesList", JSON.stringify(codes));
     }
@@ -343,89 +344,125 @@ class codesC{
 
 static saveCodesList(){
     let codes = codesC.getCodes();
+    let wrongCodes = codesC.checkWrongCodes(codes);
     let config = configColectorC.getConfig("config");
     if (codes.length >= 1) {
-      if(config[0]['colect']['colectStatus'] == 1){
-        let option = confirm(`¿Estás seguro de guardar el listado de códigos?`);
-        if(option == true){
-            info = {
-              codes: codes,
-              codeReg: config[0]['colect']['codeReg'],
-              codeDevice: config[0]['colect']['codeDevice'],
-            }
-            const promiseSaveCodes = new Promise((resolve, reject)=>{
-              alerts.showLoadingScreen();
-              $.post("connection/connection.php", info, function(response){
-              }).done(function(response){
-                  console.log(response);
-                      resolve(response);
-                  }).fail(function(xhr, textStatus, errorThrown){
-                      reject();
-                  });
-            });
+      if(wrongCodes == true){
+      if(config['inventory']['inventStatus'] == 1){
+          if(config['colect']['colectStatus'] == 1){
+            let option = confirm(`¿Estás seguro de guardar el listado de códigos?`);
+            if(option == true){
+                alerts.showLoadingScreen();
+                let codesAbst = codesC.codeAbstract(codes, config['colect']['input']);
+                info = {
+                  codes: codes,
+                  codesAbst: codesAbst,
+                  codeReg: config['colect']['codeReg'],
+                  codeDevice: config['colect']['codeDevice'],
+                  reqAct: 'saveCodesList',
+                };
+                console.log(info);
+                const promiseSaveCodes = new Promise((resolve, reject)=>{
+                  $.post("connection/connection.php", info, function(response){})
+                   .done(function(response){
+                      console.log(response);
+                      let res = JSON.parse(response);
+                      console.log(res);
+                      checkResponse(res, config, codes);
+                      if(res['reqStatus'] == true){
+                        resolve(res);
+                      }else if(res['reqStatus'] == false){
+                        reject(res);
+                      }
+                    }).fail(function(){
+                          reject();
+                      });
+                });
 
-            promiseSaveCodes.then(res =>{
-              res = JSON.parse(res);
-              if(res[0] == true){
-                codesC.deleteCodeList();
-                const alertSaveList = new alerts("alert-success", `Se ha guardado
-                                      el listado con éxito en el correlativo
-                                      ${res[1]}.`, 3000);
-                alertSaveList.showAlerts();
-                alerts.hideLoadingScreen();
-              }else{
-                const alertSaveSerPro = new alerts("alert-danger", `Se had detectado un
-                                        problema. Contacto con tu administrador`,3000);
-                alertSaveSerPro.showAlerts();
-                alerts.hideLoadingScreen();
-              }
-            }).catch(err =>{
-              const alertDontSaveList = new alerts("alert-danger", `No se pudo
-                                        guardar el listado debido a un problema de
-                                        conexión. Intenta de nuevo.`, 3000);
-              alertDontSaveList.showAlerts();
-              alerts.hideLoadingScreen();
-            });
+                promiseSaveCodes.then(res =>{
+                    const alert = new alerts("alert-success", res['message'], res['messDelayTime']);
+                    alert.showAlerts();
+                    alerts.hideLoadingScreen();
+                    codesC.deleteCodeList();
+                }).catch(err =>{
+                    const alert = new alerts("alert-danger", `<p class="text-center font-weight-bold">No se puede Guardar El listado</p>${err['message']}`, err['messDelayTime']);
+                    alert.showAlerts();
+                    alerts.hideLoadingScreen();
+                });
+            }
+          }else{
+            const alert = new alerts("alert-danger", `No puedes guardar este listado.
+                                      Tu colector está deshabilitado.`, 4000);
+            alert.showAlerts();
+          }
+        }else{
+          const alert = new alerts("alert-danger", `No puedes guardar este listado.
+                                    No existe un inventario activo.`, 4000);
+          alert.showAlerts();
         }
       }else{
-        const alert = new alerts("alert-danger", `No puedes guardar este listado.
-                                  Tu colector está deshabilitado.`, 3000);
+        const alert = new alerts("alert-danger", `Hay códigos que necesitan ser revisados.
+                                  No puedes guardar el listado hasta haber sido corregido
+                                  el problema.`, 5000);
         alert.showAlerts();
       }
     }else {
       const alert = new alerts("alert-danger", `No puedes guardar
-                                  un listado vacio.`, 3000);
+                                  un listado vacio.`, 4000);
       alert.showAlerts();
     }
   }
 
-  static deleteCodesRev(corDel){
-    if(cor>0){
-      let option = confirm('¿Estás seguro de borrar este listado de código de la base de dato');
-      if(option = true){
-        const promiseDeleteCodesRev = new Promise((resolve, reject)=>{
-          alerts.showLoadingScreen();
-          $.post("connection/connection.php", {corDel}, function(response){
-          }).done(function(response){
-                  resolve(response);
-              }).fail(function(xhr, textStatus, errorThrown){
-                  reject();
-              });
-        });
 
-        promiseDeleteCodesRev.then(res =>{
-
-        }).catch(err =>{
-
-        });
+  static codeAbstract(codes, input){
+    let codesAbst = [];
+    let code;
+    codes.forEach((element) => {
+      if(input == 1){
+        code = element['code'].substring(0,17);
       }
-    }else{
-      const alertNoCorSelected = new alerts('alert-danger', `Debe seleccionar un
-                                  correlativo.`, 3000);
-      alertNoCorSelected.showAlerts();
-    }
+      else if(input == 2){
+        code = element['code'];
+      }
+
+      if(codesAbst.includes(code) == false){
+          codesAbst.push(code);
+      }
+    });
+    return codesAbst;
   }
 
+  static checkWrongCodes(codes){
+    let check = true;
+    let color = [];
+    codes.forEach((element) => {
+      color.push(element['color']);
+    });
+    if(color.includes('text-danger')){
+      check = false;
+    }
+    return check;
+  }
+
+  static showCodesError(codesAbst, codes, input){
+    let code;
+    codesAbst.forEach((codeAbs) => {
+      codes.forEach((element) => {
+        if(input == 1){
+          code = element['code'].substring(0,17);
+        }
+        else if(input == 2){
+          code = element['code'];
+        }
+
+        if(code == codeAbs){
+            element['color'] = 'text-danger';
+        }
+      });
+    });
+    localStorage.setItem("codesList", JSON.stringify(codes));
+    table(codes, 'reverse');
+  }
 }
 
 function table(codes, sequence){
@@ -439,17 +476,18 @@ function table(codes, sequence){
       length = 1;
       codes = codes;
       break;
-
   }
   let elementTable = "";
   let numeroCode = 1;
+  let totalAmount = 0;
 
   for(i = 0; i<codes.length; i++){
+    totalAmount += codes[i]['amount'];
     elementTable += `
                     <tr>
                       <td scope="col" class="px-4 py-2">${length}</td>
-                      <td scope="col" class="px-4 py-2 ${codes[i][2]}">${codes[i][0]}</td>
-                      <td scope="col" class="px-4 py-2">${codes[i][1]}</td>
+                      <td scope="col" class="px-4 py-2 ${codes[i]['color']}">${codes[i]['code']}</td>
+                      <td scope="col" class="px-4 py-2">${codes[i]['amount']}</td>
                       <td scope="col" class="px-4 boton-delete p-2 text-center text-danger"><i class="fas fa-trash-alt delete" code="${length}"></i></td>
                     </tr>`;
     if(sequence == "reverse"){
@@ -460,40 +498,152 @@ function table(codes, sequence){
   }
   $("#codesInfoBody").html(elementTable);
   if(codes.length > 0){
-    $("#lastcode").html(codes[0][0]);
-    $("#amountlastcode").html(codes[0][1]);
+    $("#lastcode").html(codes[0]['code']);
+    $("#amountlastcode").html(codes[0]['amount']);
     $("#lengthCodes").html(codes.length);
+    $("#totalAmount").html(totalAmount);
+    amountRev = totalAmount;
   }else{
     $("#lastcode").html(0);
     $("#amountlastcode").html(0);
     $("#lengthCodes").html(0);
+    $("#totalAmount").html(0);
   }
 
 }
 
+class reviewCodeList{
 
-function callList(correlative){
-  let codes = [];
-  let code = [];
-  $.post("connection/connection.php", {correlative}, function(response){
-          res = JSON.parse(response);
-          console.log(res);
-          res.forEach((element) => {
-            code.push(element["codigo"]);
-            code.push(element["cantidad"]);
-            codes.push(code);
-            code = [];
+  static correlativeList(){
+      let config = configColectorC.getConfig();
+          if(config['inventory']['inventStatus']==1){
+          let info = {codeReg: config['colect']['codeReg'],
+                      codeDevice: config['colect']['codeDevice'],
+                      reqAct: 'getCorrelativeList',};
+          const corrLisPromise = new Promise((resolve, reject)=>{
+            $.post("connection/connection.php", info, function(response){})
+            .done(function(response){
+                console.log(response);
+                let res = JSON.parse(response);
+                checkResponse(res, config, '');
+                if(res['reqStatus'] == true){
+                  resolve(res);
+                }else if(res['reqStatus'] == false){
+                  reject(res);
+                }
+            }).fail(function(){
+                reject();
+            });
+          }).then(res=>{
+            if(res['corrByColID'] != null && res['corrByColID'] != 0){
+              let options = `<option value="0">Seleccionar</option>`;
+              res['corrByColID'].forEach((option) => {
+                options += `<option value="${option["id"]}">${option["id"]}</option>`
+              });
+              $("#select-correlative-No").html(options);
+            }
+          }).catch(err=>{
+              const alert = new alerts('alert-danger', err['message'], err['messDelayTime']);
+              alert.showAlerts();
           });
-          table(codes, "direct");
-          $('.boton-delete').remove();
-      });
+      }else{
+        const alert = new alerts('alert-danger', `No puede revisar los listados.
+                                  No exíste un inventario activo.`, 2000);
+        alert.showAlerts();
+      }
   }
 
-/*function cleanCode(code){
-  const regEx = new RegExp(/STK|stk|sTk|DCN|dcn|dCn,/, 'g');
-    code = code.replace(regEx, '');
-  return code;
-}*/
+  static callCodeList(correlative){
+    if(correlative>0){
+        let codes = [];
+        let code = [];
+        let config = configColectorC.getConfig();
+        let info = {codeReg: config['colect']['codeReg'],
+                    codeDevice: config['colect']['codeDevice'],
+                    correlative: correlative,
+                    reqAct: 'getCodeList',
+                  };
+        const collCodeListPromise = new Promise((resolve, reject)=>{
+          $.post("connection/connection.php", info, function(response){})
+          .done(function(response){
+            console.log(response);
+            let res = JSON.parse(response);
+            checkResponse(res, config, '');
+            if(res['reqStatus'] == true){
+              resolve(res);
+            }else if(res['reqStatus'] == false){
+              reject(res);
+            }
+          }).fail(function(){
+              reject();
+          });
+        }).then(res=>{
+          if(res['codeList']!=null){
+              res['codeList'].forEach((element) => {
+                code  = {'code': element['codigo'],
+                         'amount': parseInt(element['cantidad']),
+                         'color': 'text-dark',
+                        };
+                codes.push(code);
+                code = [];
+              });
+              table(codes, "direct");
+              $('.boton-delete').remove();
+          }
+        }).catch(err =>{
+            const alert = new alerts('alert-danger', err['message'], err['messDelayTime']);
+            alert.showAlerts();
+        });
+      }else{
+        const alert = new alerts('alert-danger', `Debes seleccionar un correlativo`, 2000);
+        alert.showAlerts();
+      }
+    }
+
+    static deleteCodesRev(correlative){
+      if(correlative>0){
+        let config = configColectorC.getConfig();
+        let info = {codeReg: config['colect']['codeReg'],
+                    codeDevice: config['colect']['codeDevice'],
+                    correlative: correlative,
+                    reqAct: 'deleteCodeList',
+                  };
+        let option = confirm(`¿Estás seguro de borrar el correlativo ${correlative}, con ${amountRev} pares, de la base de datos.`);
+        if(option == true){
+          alerts.showLoadingScreen();
+          const promiseDeleteCodesRev = new Promise((resolve, reject)=>{
+            $.post("connection/connection.php", info, function(response){
+            }).done(function(response){
+                    let res = JSON.parse(response);
+                    if(res['reqStatus']==true){
+                      resolve(res);
+                    }else if(res['reqStatus']==false){
+                      reject(res);
+                    }
+                    console.log(response);
+                }).fail(function(){
+                    reject();
+                });
+          }).then(res =>{
+              const alert = new alerts('alert-success', res['message'], res['messDelayTime']);
+              alert.showAlerts();
+              alerts.hideLoadingScreen();
+              reviewCodeList.correlativeList();
+          }).catch(err =>{
+              const alert = new alerts('alert-danger', err['message'], err['messDelayTime']);
+              alert.showAlerts();
+              alerts.hideLoadingScreen();
+          });
+        }else{
+          return
+        }
+      }else{
+        const alert = new alerts('alert-danger', `Debe seleccionar un
+                                    correlativo.`, 3000);
+        alert.showAlerts();
+      }
+    }
+}
 
 function ajustarTamaño() {
   md = new MobileDetect(window.navigator.userAgent);
@@ -524,13 +674,37 @@ function ajustarTamaño() {
   }
 }
 
-function correlativeList(colectorRequest){
-    $.post("connection/connection.php", {colectorRequest}, function(response){
-        let res = JSON.parse(response);
-        let options = `<option value="0">Seleccionar</option>`;
-        res.forEach((option) => {
-          options += `<option value="${option["id"]}">${option["id"]}</option>`
-        });
-        $("#select-correlative-No").html(options);
-      });
+
+
+function checkResponse(res, config, codes){
+  config['colect']['colectStatus'] = res['colStatus'];
+  config['inventory']['inventId'] = res['invId'];
+  config['inventory']['inventStatus'] = res['invStatus'];
+  config['inventory']['inventBranchOffice'] = res['invBranch'];
+  if(res['coleReg'] == false){
+    config['colect']['codeReg'] = '';
+    config['colect']['codeDevice'] = '';
+    setTimeout(()=>{
+      location.replace('?ruta=login');
+    },res['messageTime']);
+  }
+
+  if(res['invStatus'] == 1 && res['colStatus'] == 1){
+    $('#code_product').removeAttr('readonly').focus();
+  }else{
+    $('#code_product').attr('readonly', true);
+    if(res['invStatus'] == 0){
+      let codes = [];
+      localStorage.setItem("codesList", JSON.stringify(codes));
+      codes = codesC.getCodes();
+      table(codes, 'reverse');
+    }
+  }
+
+  localStorage.setItem("config", JSON.stringify(config));
+
+  if(res['reqStatus'] == false && res['codeErr'] != null){
+    codesC.showCodesError(res['codeErr'], codes, config['colect']['input']);
+  }
+
 }

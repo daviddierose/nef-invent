@@ -14,5 +14,5 @@ $(document).ready(function(){
       event.preventDefault();
       let codeReg = $("#colect-code").val();
       configColectorC.saveCodeReg(codeReg);
-    });
+    }); 
 })

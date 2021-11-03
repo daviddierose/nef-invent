@@ -10,6 +10,7 @@
   <body>
   <?php
     include "vistas/modulos/sidebar.php";
+		include "vistas/modulos/alerts.php";
 
    ?>
    <div class="page-content p-3 active" id="content">
@@ -23,6 +24,7 @@
         ?>
         <div class="row">
           <?php
+						include "vistas/modulos/info-table.php";
             include "vistas/modulos/table.php";
            ?>
         </div>

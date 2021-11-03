@@ -42,14 +42,14 @@ body{
   margin-left: -100%;
 }
 /*Info Colector*/
-#colectId{
+#colectId, #inventId,  #sucursal{
   font-size: 0.95rem;
   font-weight: bold;
 }
-#colectId p span{
+#colectId p span, #inventId p span, #sucursal p span{
   font-weight: normal;
 }
-#colectId p{
+#colectId p, #inventId p, #sucursal p{
   margin-bottom: 0px;
   padding-bottom: 0px;
 }
@@ -117,26 +117,12 @@ body{
   z-index: 1;
 }
 
-/*@media only screen and (max-width: 1000px){
-  #formulario{
-    width: 100%;
-  }
+#row-inputAmout{
+  background-color: #717272ba;
+  display: none;
+}
 
-  .codeTable{
-    height: 5rem;
-  }
-
-  option{
-    font-size: 1rem;
-  }
-
-}*/
-
-
-
-/*@media only screen and (min-width: 768px){
-  .menu-item{
-    padding: 5px 25px;
-    font-size: 3rem;
-  }
-}*/
+#form-inputAmout{
+  width: 50vw;
+  height: 50vh;
+}

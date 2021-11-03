@@ -10,6 +10,7 @@
   <body>
     <?php
       include "vistas/modulos/sidebar.php";
+			include "vistas/modulos/alerts.php";
      ?>
     <div class="page-content p-3 active" id="content">
       <?php
@@ -22,7 +23,3 @@
     </div>
   </body>
 </html>
-<?php
-  $ingreso = new AdminC();
-  $ingreso -> IngresoC();
- ?>
