@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <script src="../js/jquery-3.5.1.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/functions.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/core.min.js"></script>
+    <script src="../js/md5.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/estilosm.css">
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="../css/estilos-icon.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    <title>Nefnodel | Configuración del Colector</title>
+  </head>
+  <body>
+    <!--Menú-->
+    <div class="vertical-nav active pb-3" id="sidebar">
+      <div class="py-4 px-3">
+          <div class="media d-flex align-items-center">
+            <img src="../img/logo-horizontal.png" alt="..." class="mr-3 logo">
+            <button id="sidebarCollapseM" type="button" class="btn px-4 mb-2 sidebarCollapse  text-danger text-uppercase text-center ml-auto mr-2">
+              <span class="icon-bars"></span>
+            </button>
+          </div>
+      </div>
+      <div class="bg-gray text-light px-4 py-3 mb-4">
+        <div id="colectId"></div>
+        <div id="inventId"></div>
+        <div id="sucursal"></div>
+      </div>
+      <div class="form-group my-5 mx-4">
+        <label for="colect_name">Tipo de Ingreso</label>
+        <select class="custom-select custom-select text-capitalize" id="select-config-In">
+             <option value="0">Seleccionar</option>
+             <option value="1">Etiquetas Nefnodel</option>
+             <option value="2">Plastico</option>
+        </select>
+      </div>
+      <div class="">
+        <ul class="nav flex-column mb-0">
+          <li  id="inCodesLink">
+            <a class="nav-link text-uppercase text-gray px-4" href="#">
+              <span class="icon-pen mr-2"></span>Ingresar códigos
+            </a>
+          </li>
+          <li  id="ConfigLink">
+            <a class="nav-link text-uppercase text-gray active px-4" href="#">
+              <span class="icon-cog mr-2"></span>Configuración
+            </a>
+          </li>
+          <li  id="RevListLink">
+            <a class="nav-link text-uppercase text-gray px-4" href="#">
+              <span class="icon-clipboard-list mr-2"></span>Revisar Listados
+            </a>
+          </li>
+        </ul>
+        <div class="separator"></div>
+        <ul class="nav flex-column bg-white mb-0">
+          <li class="" id="#logOut">
+            <a class="nav-link text-uppercase text-red px-4" href="#">
+              <span class="icon-sign-out-alt mr-2"></span>Salir
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!--Alerts-->
+    <div class="container-fluid fixed-top alertsRow" id="row-alert">
+      <div class="row bg-light vh-100">
+        <div class="m-auto" id="Alert">
+            <div class="mx-3 " id="medio">
+              <div class="pt-5 px-1 tex-center" id="Alert-text">
+              </div>
+              <div class="col-sm-10 mb-5 mt-4 mx-auto text-center">
+                <button class="btn btn-danger d-none" type="button" name="button" id="alert-boton">Aceptar</button>
+              </div>
+            </div>
+            </div>
+        </div>
+      </div>
+      <!--loading Screen-->
+      <div class="container-fluid fixed-top vw-100 vh-100 bg-light" id="loading-screen">
+        <div class="row h-100 w-100">
+          <div class="col-sm-12 my-auto">
+            <div class="col-sm-12 text-center">
+              <div class="spinner-border text-azulSec m-auto" style="width: 6rem; height: 6rem;" role="status" >
+              </div>
+            </div>
+            <div class="col-sm-12 text-center">
+              <div class="m-auto">
+                <p>Cargando...</p>
+              </div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <!--Content-->
+      <div class="page-content p-3 active" id="content">
+      <!--Boton Menu-->
+        <button type="button" class="btn mb-4 sidebarCollapse  text-danger text-uppercase">
+          <span class="icon-bars"></span>
+        </button>
+ 			 <!--Información por página-->
+       <!--formRegister-->
+       <div class="container-fluid mt-5">
+        <div class="row" id="form-row-ajust">
+          <div class="col-md-12 m-auto" id="login-form-div">
+            <form class="w-100 mt-3 py-3">
+              <div class="form">
+                <h1 class="text-center mb-4 text-uppercase">Configurar Colector</h1>
+                <form method="post" action="" class="row g-3" id="formulario">
+                  <div class="form-group">
+                    <input type="text" class="form-control w-100 text-capitalize" id="colect-name" placeholder="Colector" name="usuarioI" readonly>
+                  </div>
+                  <div class="form-group">
+                    <input type="input" class="form-control w-100" id="colect-code" placeholder="Código de Registro" name="claveI" required>
+                  </div>
+                  <div class="form-group">
+                    <input type="submit" value="Guardar" class="btn btn-azulSec rounded-0 btn-block" id="btn-save-id">
+                  </div>
+                </form>
+              </div>
+            </form>
+          </div>
+        </div>
+       </div>
+ 		 </div>
+     <script type="text/javascript">
+       page = 'config-colect';
+     </script>
+  </body>
+</html>

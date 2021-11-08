@@ -39,7 +39,7 @@
         if($rutas == "review-list"){
           $menu2 ='<div class="separator"></div>
             <ul class="nav flex-column bg-white mb-0">
-              <li class="" id="deleteListCodes">
+              <li class="my-2"  id="deleteListCodes">
                 <a class="nav-link text-uppercase text-red" href="#">
                   <i class="fas fa-trash-alt mr-2"></i>Eliminar Listado
                 </a>
