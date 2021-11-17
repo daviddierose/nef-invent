@@ -3,23 +3,17 @@
   require_once "conexionbd.php";
 
   class AdminM extends ConexionBD{
-    static public function IngresoM($datosC, $tableBD){
+    public $table;
+    public $info;
+
+    public function IngresoM(){
       $pdo = new ConexionBD();
-      $pst = $pdo->bd->prepare("SELECT usuario, clave, codigo_usuario FROM $tableBD WHERE usuario = :usuario");
-      $pst->bindParam(":usuario", $datosC["usuario"], PDO::PARAM_STR);
+      $pst = $pdo->bd->prepare("SELECT usuario, clave, codigo_usuario FROM $this->table WHERE usuario = :usuario");
+      $pst->bindParam(":usuario", $this->info, PDO::PARAM_STR);
       $pst->execute();
       return $pst->fetch();
       unset($pdo);
     }
-
-    static public function readColectoresM($tableBD){
-      $pdo = new ConexionBD();
-      $pst = $pdo->bd->prepare("SELECT nombre, status FROM $tableBD");
-      $pst->execute();
-      return $pst->fetchAll();
-      unset($pdo);
-    }
-
   }
 
  ?>

@@ -1,5 +1,8 @@
 <?php
-class inventoryM{
+  require_once "conexionbd.php";
+class inventoryM extends ConexionBD{
+  public $table;
+  public $info;
   static public function reviewStatusInventM(){
     $pdo = new ConexionBD();
     $pst = $pdo->bd->query("SELECT MAX(id) AS id FROM inventarios WHERE status='1'");

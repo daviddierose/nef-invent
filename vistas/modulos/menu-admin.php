@@ -42,8 +42,8 @@
   <div class="collapse" id="collapseColectors">
     <ul class="nav flex-column mb-0">
       <?php
-         $rutas = new adminC();
-         $rutas -> readColectoresC();
+        $colector = new loadC();
+        $colector->loadColectoresC();
        ?>
     </ul>
   </div>

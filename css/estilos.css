@@ -71,6 +71,7 @@ body{
 #sidebar ul li .active{
   color: #2c2c2c;
 }
+
 .text-primary{
   color: #7579e7;
 }
@@ -91,30 +92,95 @@ body{
   padding: 0.6rem 0;
 }
 
+.changeChart, .sidebarCollapse{
+  max-height: 2.5rem;
+}
+
+.changeChart i{
+  font-size: 1rem;
+}
+
+#infoTop{
+  display: table;
+}
+
+.infoTop{
+  font-size: 1rem;
+  font-weight: bold;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.infoTop span{
+  font-weight: normal;
+}
+
 /*contenido*/
 .page-content{
   width: cal(100% - 17rem);
   margin-left: 17rem;
   transition: all 0.4s;
 }
+
 #content.active{
   width: 100%;
   margin: 0;
 }
 
-/*Info in Code*/
-.info{
-  font-weight: bold;
+canvas{
+  max-height: 39vh;
+  width: 100%;
+  height: 90%;
 }
 
-.infoG{
-  font-size: 0.5rem;
+.col-canvas{
+  max-height: 42vh;
+  display: flex;
+  align-items: center;
+  border-radius: 10px!important;
+}
+/*ScrollBar*/
+#colTable::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+#colTable::-webkit-scrollbar:vertical {
+  width:10px;
+}
+
+#colTable::-webkit-scrollbar-button:increment,.contenedor::-webkit-scrollbar-button {
+    display: none;
+}
+
+#colTable::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+#colTable::-webkit-scrollbar-thumb {
+    background-color: #E45252;
+    border-radius: 20px;
+    border: 2px solid #f1f2f3;
+}
+
+#colTable::-webkit-scrollbar-track {
+    margin: 0.8rem;
+    border-radius: 10px;
+}
+
+/*Tabla*/
+.btn-table{
+  padding: 0.3rem 0.5rem 0.3rem 0.5rem!important;
+  border-radius: 0.5rem!important;
+  font-size: 0.8rem!important;
 }
 
 /*Alertas*/
-.alertsRow, #loading-screen{
+#alertTop, #loading-screen{
   display: none;
-  z-index: 1;
+}
+
+#alertTop span{
+  font-weight: bold;
 }
 
 #row-inputAmout{

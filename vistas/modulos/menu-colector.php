@@ -43,9 +43,5 @@
         </a>
       </li>
     </ul>
-    <?php
-      $extraMenu = new rutasControlador();
-      $extraMenu -> menusColect2R();
-    ?>
   </div>
 </div>

@@ -55,7 +55,7 @@
        $colectorRV = new colectorC();
        $colectorRV -> registerColectorC($codesRD, $response);
      }
-    $response->getResponse();
+    $response->getResponseColect();
   }
   else if(isset($_POST['user'])
   && isset($_POST['pass'])
@@ -66,7 +66,7 @@
     $response = new responseC();
     $login = new adminC();
     $login-> ingresoC($user, $pass, $response);
-    $response->getResponse();
+    $response->getResponseColect();
   }
 
 

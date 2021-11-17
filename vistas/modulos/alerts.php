@@ -1,14 +1,4 @@
-<div class="container-fluid fixed-top alertsRow" id="row-alert">
-  <div class="row bg-light vh-100">
-    <div class="m-auto" id="Alert">
-      <div class="pt-5 px-5 text-uppercase" id="Alert-text">
-      </div>
-      <div class="col-sm-10 mb-5 mt-4 mx-auto text-center">
-        <button class="btn btn-danger d-none" type="button" name="button" id="alert-boton">Aceptar</button>
-      </div>
-    </div>
-  </div>
-</div>
+<div class="alert fixed-top text-center" role="alert" id="alertTop"></div>
 
 <div class="container-fluid fixed-top vw-100 vh-100 bg-light" id="loading-screen">
   <div class="row h-100 w-100">

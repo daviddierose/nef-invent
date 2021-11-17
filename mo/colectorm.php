@@ -2,27 +2,39 @@
   require_once "conexionbd.php";
   require_once "../co/encryptc.php";
 
-  class colectorM{
+  class colectorM extends ConexionBD{
+    public $table;
+    public $info;
 
-    static public function changeColectorStatusM($colector, $status){
+    public function changeColectorStatusM(){
       $pdo = new ConexionBD();
       try{
+        $status;
         $pdo ->bd->beginTransaction();
-        $pst = $pdo->bd->prepare('UPDATE colectores SET status=:status WHERE id=:id');
+        $pst = $pdo->bd->prepare("SELECT status FROM $this->table WHERE id=:id");
+        $pst->bindParam(':id',$this->info, PDO::PARAM_INT);
+        $pst->execute();
+        $sta = $pst->fetch();
+        if($sta['status'] == 0){
+          $status = 1;
+        }else if($sta['status'] == 1){
+          $status = 0;
+        }
+
+        $pst = $pdo->bd->prepare("UPDATE $this->table SET status=:status WHERE id=:id");
         $pst->bindParam(':status', $status, PDO::PARAM_INT);
-        $pst->bindParam(':id',$colector, PDO::PARAM_INT);
+        $pst->bindParam(':id',$this->info, PDO::PARAM_INT);
         $pst->execute();
         $pdo->bd->commit();
 
-        $pst = $pdo->bd->prepare('SELECT status FROM colectores WHERE id=:id');
-        $pst->bindParam(':id',$colector, PDO::PARAM_INT);
-        $pst->execute();
-        $sta = $pst->fetch();
-        $response = array(true, $colector, $sta);
+        $response = array('reqStatus'=>true,
+                          'colStatus'=>$status,
+                          'message'=>"Estatus del colector <span>$this->info</span> cambiado con éxito");
       }
       catch(PDOException $ex){
         $pdo->bd->rollback();
-        $response = "Hay un problema con la base de datos, contacto con tu tecnico.";
+        $response = array('reqStatus'=>false,
+                          'message'=>'Hay un problema con la base de datos, contacto con tu tecnico.');
       }
       unset($pdo);
       return $response;
@@ -55,10 +67,10 @@
       return $response;
     }
 
-    static public function verificarStatusCodRegM($table, $codeReg){
+    public function verificarStatusCodRegM(){
       $pdo = new ConexionBD();
-      $pst = $pdo->bd->prepare("SELECT * FROM $table WHERE codigo=:codigo");
-      $pst->bindParam(':codigo',$codeReg, PDO::PARAM_STR);
+      $pst = $pdo->bd->prepare("SELECT * FROM $this->table WHERE codigo=:codigo");
+      $pst->bindParam(':codigo',$this->info, PDO::PARAM_STR);
       $pst->execute();
       $verif = $pst->fetch();
       if($verif != null){
@@ -84,5 +96,6 @@
       unset($pdo);
       return ($response);
     }
+
   }
  ?>

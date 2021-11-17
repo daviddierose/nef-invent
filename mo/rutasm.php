@@ -3,43 +3,23 @@
   class Modelo{
     static public function rutasModelo($rutas){
       if($rutas == "login"
-      || $rutas == "in-code"
-      || $rutas == "config-colect"
-      || $rutas == "review-list"
-      || $rutas == "exitc"
       || $rutas == "config-admin"){
           $pagina = "vistas/templates/" . $rutas . ".php";
       }
       else if($rutas == "index") {
-          $pagina = "vistas/templates/in-code.php";
+          $pagina = "vistas/templates/config-admin.php";
       }
       else{
-          $pagina = "vistas/templates/in-code.php";
+          $pagina = "vistas/templates/config-admin.php";
       }
       return $pagina;
-    }
-
-    static public function menusColect1M($rutas){
-      if($rutas == "login"
-      || $rutas == "in-code"
-      || $rutas == "config-colect"
-      || $rutas == "review-list"
-      || $rutas == "exitc"){
-          $menu = "vistas/modulos/menu-colector.php";
-      }else if($rutas == "index") {
-          $menu = "vistas/modulos/menu-colector.php";
-      }
-      else{
-          $menu = "vistas/modulos/menu-colector.php";
-      }
-      return $menu;
     }
 
     static public function menusColect2M($rutas){
         if($rutas == "review-list"){
           $menu2 ='<div class="separator"></div>
             <ul class="nav flex-column bg-white mb-0">
-              <li class="" id="deleteListCodes">
+              <li class="my-2"  id="deleteListCodes">
                 <a class="nav-link text-uppercase text-red" href="#">
                   <i class="fas fa-trash-alt mr-2"></i>Eliminar Listado
                 </a>
@@ -90,23 +70,17 @@
   }
 
     static public function headTittlesM($rutas){
-      if($rutas == "review-list"){
-          $headTittle = "Revisión de Listados | Nefnodel Colector";
-      }
-      else if($rutas == "config-colect"){
-          $headTittle = "Configuración de Colector | Nefnodel Colector";
-      }
-      else if($rutas == "login"){
+      if($rutas == "login"){
           $headTittle = "Ingreso al Admin | Nefnodel Colector";
       }
       else if($rutas == "config-admin"){
           $headTittle = "Administrador | Nefnodel Colector";
       }
       else if($rutas == "index" || $rutas == "in-code") {
-          $headTittle = "Ingreso de Códigos | Nefnodel Colector";
+          $headTittle = "Administrador | Nefnodel Colector";
       }
       else{
-          $headTittle = "Ingreso de Códigos | Nefnodel Colector";
+          $headTittle = "Administrador | Nefnodel Colector";
       }
       return $headTittle;
     }
@@ -128,23 +102,6 @@
           $th = "<th></th>";
       }
       return $th;
-    }
-
-    static public function appM($rutas){
-      if($rutas == "login"){
-        $app = '<script src="js/functions-log.js"></script>
-    		<script src="js/app-log.js"></script>';
-      }else if($rutas == "config-colect" ){
-        $app = '<script src="js/functions-cc.js"></script>
-    		<script src="js/app-cc.js"></script>';
-      }else if($rutas == "config-admin"){
-        $app = '<script src="js/functions-admin.js"></script>
-    		<script src="js/app-admin.js"></script>';
-      }else{
-        $app = '<script src="js/functions.js"></script>
-    		<script src="js/app.js"></script>';
-      }
-      return $app;
     }
 
   }

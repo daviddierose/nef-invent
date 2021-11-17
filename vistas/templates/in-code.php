@@ -9,7 +9,7 @@
 	 ?>
 	 <body>
  		<?php
- 			include "vistas/modulos/sidebar.php";
+ 			include "vistas/modulos/menu-colector.php";
  			include "vistas/modulos/alerts.php";
  		 ?>
 		 <div class="page-content p-3 active" id="content">

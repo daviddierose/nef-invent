@@ -1,5 +1,3 @@
-const music = new Audio('../inventario/vistas/sound/alarm.mp3');
-var alarmaCodeWrong;
 var md;
 let info, date, ok, bad;
 var amount;

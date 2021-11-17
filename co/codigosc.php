@@ -52,6 +52,7 @@
               $response->reqStatus = true;
               $response->corrByColID = $correlative;
               $response->message = '';
+              $response->messDelayTime = 0;
             }else{
               $response-> message = 'No hay correlativos guardados desde este colector.';
               $response->messDelayTime= 2000;
@@ -70,6 +71,7 @@
             $response->reqStatus = true;
             $response->codeList = $codeList;
             $response->message = '';
+            $response->messDelayTime = 0;
           }else{
             $response-> message = 'No hay codigos guardados en este correlativo.';
             $response->messDelayTime= 2000;
@@ -96,6 +98,39 @@
             $response->messDelayTime = 2000;
           }
 
+      }
+    }
+
+    public function getInfoInvenC($info, $response){
+      if($info['corrId'] == ''){
+        $inventInfo = new codigosM();
+        $inventInfo->table = 'correlativo';
+        $inventInfo->info = $info['inventId'];
+        $resCor = $inventInfo->getAllCorrM();
+        if(count($resCor)>0){
+          $response->corrByColID = $resCor;
+          $inventInfo->table = 'codigos';
+          $inventInfo->info = $resCor;
+          $resCodes = $inventInfo->getAllCodesM();
+          if(count($resCodes)>0){
+            $response->codeList = $resCodes;
+            $inventInfo->table = 'proveedores';
+            $inventInfo->info = $resCodes;
+            $response->providerList = $inventInfo->getProvidesrInfo();
+            $response->reqStatus = true;
+            $response->message = 'Información obtenida con éxito.';
+            $response->messDelayTime = 4000;
+          }else{
+            $response->message = 'Todavía no hay códigos guardados en este inventario.';
+            $response->messDelayTime = 4000;
+          }
+        }else{
+          $response->message = 'Todavía no hay códigos guardados en este inventario.';
+          $response->messDelayTime = 4000;
+        }
+      }
+      else{
+        $response->message = 'algo fallo';
       }
     }
   }
